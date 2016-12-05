@@ -12,6 +12,8 @@
 using namespace std;
 using namespace NERvGear;
 
+const UID infoDataUID = { 0xf3594f55, 0xe57c, 0x4988,{ 0xbe, 0x3c, 0x2d, 0xd4, 0xbd, 0x02, 0xc9, 0xa4 } };
+
 iTunesSupportDataSource::iTunesSupportDataSource()
 {
 }
@@ -56,11 +58,13 @@ long NVG_METHOD iTunesSupportDataSource::GetData(unsigned index, NERvGear::IData
 	return S_OK;
 }
 
-long NVG_METHOD iTunesSupportDataSource::FindData(const NERvGear::UID & id, NERvGear::IData ** data)
+long iTunesSupportDataSource::FindData(const NERvGear::UID& id, NERvGear::IData ** data)
 {
 	if (data == NULL)
 		return E_INVALIDARG; 
-	if (id == infoDataUID) *data = nvg_new iTunesSupportInfoData(this);
+
+	if (id.Data1 == 0xf3594f55) 
+		*data = nvg_new iTunesSupportInfoData(this);
 	else return E_FAIL;
 	return S_OK;
 }

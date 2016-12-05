@@ -8,6 +8,8 @@ using namespace iTunesSupportImpl;
 
 static const wchar_t UNIT_ENUM[] = L"√Î\0";
 
+const UID iTunesSupportInfoData::dataUID = { 0xf3594f55, 0xe57c, 0x4988,{ 0xbe, 0x3c, 0x2d, 0xd4, 0xbd, 0x02, 0xc9, 0xa4 } };
+
 long NVG_METHOD iTunesSupportInfoData::GetId(NERvGear::UID * id)
 {
 	*id = dataUID;

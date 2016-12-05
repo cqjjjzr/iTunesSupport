@@ -11,7 +11,7 @@ class iTunesSupportInfoData :
 {
 public:
 	// {F3594F55-E57C-4988-BE3C-2DD4BD02C9A4}
-	const UID dataUID = { 0xf3594f55, 0xe57c, 0x4988,{ 0xbe, 0x3c, 0x2d, 0xd4, 0xbd, 0x2, 0xc9, 0xa4 } };
+	const static UID dataUID;
 
 	iTunesSupportInfoData(iTunesSupportDataSource* dataSource);
 	~iTunesSupportInfoData();
