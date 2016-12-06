@@ -16,6 +16,7 @@ const UID infoDataUID = { 0xf3594f55, 0xe57c, 0x4988,{ 0xbe, 0x3c, 0x2d, 0xd4, 0
 
 iTunesSupportDataSource::iTunesSupportDataSource()
 {
+	infoData = nvg_new iTunesSupportInfoData(this);
 }
 
 iTunesSupportDataSource::~iTunesSupportDataSource()
@@ -51,7 +52,7 @@ long NVG_METHOD iTunesSupportDataSource::GetData(unsigned index, NERvGear::IData
 		return E_INVALIDARG;
 
 	switch (index) {
-	case 0: *data = nvg_new iTunesSupportInfoData(this); break;
+	case 0: *data = infoData; break;
 	//case 1: *data = nvg_new iTunesSupportInfoControl(this); break;
 	default: return E_FAIL;
 	}
@@ -63,8 +64,8 @@ long iTunesSupportDataSource::FindData(const NERvGear::UID& id, NERvGear::IData 
 	if (data == NULL)
 		return E_INVALIDARG; 
 
-	if (id.Data1 == 0xf3594f55) 
-		*data = nvg_new iTunesSupportInfoData(this);
+	if (id == infoDataUID) 
+		*data = infoData;
 	else return E_FAIL;
 	return S_OK;
 }

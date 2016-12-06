@@ -9,7 +9,9 @@ namespace iTunesSupportImpl
 {
     public class iTunesSupportImplWrapper
     {
-        private iTunesSupportImplWrapper() { }
+        private iTunesSupportImplWrapper() {
+            init();
+        }
         private static iTunesSupportImplWrapper instance;
 
         public static iTunesSupportImplWrapper getInstance()
@@ -49,11 +51,25 @@ namespace iTunesSupportImpl
 
         public int update()
         {
-            IITTrack prev = currentTrack;
-            currentTrack = iTunes.CurrentTrack;
-            if (prev != null && currentTrack != null && (currentTrack.Name != prev.Name || currentTrack.Size != prev.Size))
-                updateLyrics();
-            return SUCCESS;
+            try
+            {
+#if DEBUG
+                File.AppendAllText("Error.txt", "Entry update()");
+#endif
+                IITTrack prev = currentTrack;
+                currentTrack = iTunes.CurrentTrack;
+                if (prev != null && currentTrack != null && (currentTrack.Name != prev.Name || currentTrack.Size != prev.Size))
+                    updateLyrics();
+#if DEBUG
+                File.AppendAllText("Error.txt", "Exit update()");
+#endif
+                return SUCCESS;
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.StackTrace);
+                return FAIL;
+            }
         }
 
         public int updateLyrics()

@@ -34,9 +34,6 @@ long NVG_METHOD iTunesSupport::OnInitial()
 
 long NVG_METHOD iTunesSupport::OnReady()
 {
-	iTunesSupportImplWrapper::getInstance()->init();
-	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("iTunes Support Ready."));
-
 	return PluginImpl::OnReady();
 }
 

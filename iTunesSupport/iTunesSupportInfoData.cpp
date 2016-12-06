@@ -4,6 +4,8 @@
 #include "vcclr.h"
 #include <NERvGear/string.h>
 
+#include "iTunesSupportDataSource.h";
+
 using namespace iTunesSupportImpl;
 
 static const wchar_t UNIT_ENUM[] = L"Ãë\0";
@@ -182,7 +184,8 @@ long NVG_METHOD iTunesSupportInfoData::Update(unsigned index, const wchar_t * pa
 	if (index >= 8)
 		return E_INVALIDARG;
 
-	iTunesSupportImplWrapper::getInstance()->update();
+	iTunesSupportImplWrapper^ wrapper = iTunesSupportImplWrapper::getInstance();
+	wrapper->update();
 	return S_OK;
 }
 

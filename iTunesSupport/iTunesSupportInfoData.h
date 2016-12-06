@@ -2,9 +2,9 @@
 #include <NERvGear\template.h>
 #include <NERvGear\interface\IData.h>
 
-#include "iTunesSupportDataSource.h"
-
 using namespace NERvGear;
+
+class iTunesSupportDataSource;
 
 class iTunesSupportInfoData :
 	public NERvGear::ImplT<NVG_ARGS_ITF_UID(IData)>
