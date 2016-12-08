@@ -1,4 +1,4 @@
-#using "C:\Users\cqjjj\Documents\Visual Studio 2015\Projects\iTunesSupport\iTunesSupportImpl\bin\Debug\iTunesSupportImpl.dll"
+//#using "C:\Users\cqjjj\Documents\Visual Studio 2015\Projects\iTunesSupport\iTunesSupportImpl\bin\Debug\iTunesSupportImpl.dll"
 #include <NERvGear\plugin.h>
 #include <NERvGear\NERvSDK.h>
 #include <NERvGear\COM.h>
@@ -15,7 +15,7 @@
 #include "stdafx.h"
 #include "ref.h"
 
-using namespace iTunesSupportImpl;
+//using namespace iTunesSupportImpl;
 using namespace std;
 using namespace NERvGear;
 
@@ -40,7 +40,7 @@ long NVG_METHOD iTunesSupport::OnReady()
 long NVG_METHOD iTunesSupport::OnRelease()
 {
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Unloading iTunes Support"));
-	iTunesSupportImplWrapper::getInstance()->destroy();
+	//iTunesSupportImplWrapper::getInstance()->destroy();
 	return PluginImpl::OnRelease();
 }
 

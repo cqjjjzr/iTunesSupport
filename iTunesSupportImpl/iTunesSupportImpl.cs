@@ -242,5 +242,10 @@ namespace iTunesSupportImpl
                 return currentTrackLyrics[currentTrackLyrics.Count - 1];
             }
         }
+
+        public void writeSomething()
+        {
+            File.AppendAllText("Error.txt", "writesomething");
+        }
     }
 }

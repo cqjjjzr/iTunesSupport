@@ -1,12 +1,17 @@
-#using "C:\Users\cqjjj\Documents\Visual Studio 2015\Projects\iTunesSupport\iTunesSupportImpl\bin\Debug\iTunesSupportImpl.dll"
+//#using "C:\Users\cqjjj\Documents\Visual Studio 2015\Projects\iTunesSupport\iTunesSupportImpl\bin\Debug\iTunesSupportImpl.dll"
 #include "iTunesSupportInfoData.h"
 #include "utils.h"
-#include "vcclr.h"
+//#include "vcclr.h"
 #include <NERvGear/string.h>
+#include <NERvGear\plugin.h>
+#include <NERvGear\NERvSDK.h>
+#include <iostream>
+#include <cstdio>
 
 #include "iTunesSupportDataSource.h";
 
-using namespace iTunesSupportImpl;
+using namespace std;
+//using namespace iTunesSupportImpl;
 
 static const wchar_t UNIT_ENUM[] = L"√Î\0";
 
@@ -44,10 +49,10 @@ unsigned NVG_METHOD iTunesSupportInfoData::GetValueCount()
 	return 8;
 }
 
-size_t writeValue(System::String ^value, size_t nbyte, void* buf);
+//size_t writeValue(System::String ^value, size_t nbyte, void* buf);
 size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, void * buf)
 {
-	switch (index) {
+	/*switch (index) {
 	case 5:
 		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->getVolume();
 		return sizeof(unsigned);
@@ -61,15 +66,21 @@ size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, 
 	case 6: return writeValue(iTunesSupportImplWrapper::getInstance()->getLyric()->LyricLine1, nbyte, buf);
 	case 7: return writeValue(iTunesSupportImplWrapper::getInstance()->getLyric()->LyricLine2, nbyte, buf);
 	default:return 0;
+	}*/
+	if (index == 5 || index == 0) {
+		*reinterpret_cast<unsigned*>(buf) = 10;
+		return sizeof(unsigned);
 	}
+	
+	return NERvCopyString(L"wtf", nbyte / 2, static_cast<wchar_t*>(buf)) * 2;
 }
 
-size_t writeValue(System::String ^value, size_t nbyte, void* buf) {
-	pin_ptr<const wchar_t> pinchars = PtrToStringChars(value);
-	int res = NERvCopyString(pinchars, nbyte / 2, static_cast<wchar_t*>(buf)) * 2;
-	pinchars = nullptr;
-	return res;
-}
+//size_t writeValue(System::String ^value, size_t nbyte, void* buf) {
+//	pin_ptr<const wchar_t> pinchars = PtrToStringChars(value);
+//	int res = NERvCopyString(pinchars, nbyte / 2, static_cast<wchar_t*>(buf)) * 2;
+//	pinchars = nullptr;
+//	return res;
+//}
 
 size_t NVG_METHOD iTunesSupportInfoData::GetMaximum(unsigned index, size_t nbyte, void * buf)
 {
@@ -78,7 +89,8 @@ size_t NVG_METHOD iTunesSupportInfoData::GetMaximum(unsigned index, size_t nbyte
 		*reinterpret_cast<unsigned*>(buf) = 100;
 		return sizeof(unsigned);
 	case 0:
-		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->getTrackLengthInSecond();
+		//*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->getTrackLengthInSecond();
+		*reinterpret_cast<unsigned*>(buf) = 1000;
 		return sizeof(unsigned);
 	default:return 0;
 	}
@@ -183,9 +195,18 @@ long NVG_METHOD iTunesSupportInfoData::Update(unsigned index, const wchar_t * pa
 {
 	if (index >= 8)
 		return E_INVALIDARG;
+	/*FILE* file2 = fopen("ErrorLog.txt", "a");
+	fprintf(file2, "Entry Update\n");
+	fclose(file2);
 
 	iTunesSupportImplWrapper^ wrapper = iTunesSupportImplWrapper::getInstance();
+	NERvLogInfo(NVG_TEXT("iTunesSupport"), L"Got wrapper object.");
+	wrapper->writeSomething();
 	wrapper->update();
+	NERvLogInfo(NVG_TEXT("iTunesSupport"), L"Updated.");
+	FILE* file = fopen("ErrorLog.txt", "a");
+	fprintf(file, "Exit Update\n");
+	fclose(file);*/
 	return S_OK;
 }
 
@@ -229,8 +250,7 @@ iTunesSupportInfoData::iTunesSupportInfoData(iTunesSupportDataSource* dataSource
 
 iTunesSupportInfoData::~iTunesSupportInfoData()
 {
-	if (parentSource) {
+	if (parentSource)
 		parentSource->Release();
-		parentSource = NULL;
-	}
+	parentSource = nullptr;
 }
