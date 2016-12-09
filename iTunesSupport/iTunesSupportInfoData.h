@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ITS_ITUNES_SUPPORT_INFO_DATA
+#define ITS_ITUNES_SUPPORT_INFO_DATA
 #include <NERvGear\template.h>
 #include <NERvGear\interface\IData.h>
 
@@ -12,9 +13,6 @@ class iTunesSupportInfoData :
 public:
 	// {F3594F55-E57C-4988-BE3C-2DD4BD02C9A4}
 	const static UID dataUID;
-
-	iTunesSupportInfoData(iTunesSupportDataSource* dataSource);
-	~iTunesSupportInfoData();
 
 	virtual long NVG_METHOD GetId(NERvGear::UID* id);
 
@@ -45,7 +43,10 @@ public:
 
 	virtual long NVG_METHOD SetEventListener(NERvGear::IEventHandler* listener);
 
+	iTunesSupportInfoData(iTunesSupportDataSource* dataSource);
+	~iTunesSupportInfoData();
+
 private:
 	iTunesSupportDataSource* parentSource;
 };
-
+#endif

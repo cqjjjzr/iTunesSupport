@@ -114,25 +114,33 @@ namespace iTunesSupportImpl
                 string line;
                 while((line = reader.ReadLine()) != null)
                 {
-                    if (!line.StartsWith("[")) continue;
-                    if (line.StartsWith("[ti:") ||
-                        line.StartsWith("[ar:") ||
-                        line.StartsWith("[al:") ||
-                        line.StartsWith("[by:")) continue;
-                    if (line.StartsWith("[offset:"))
+                    if(!line.StartsWith("l1") && !line.StartsWith("l2"))
                     {
-                        processOffset(line);
+                        if (!line.StartsWith("[")) continue;
+                        line = "l1" + line;
+                    }
+                    string linesub = line.Substring(2);
+                    if (linesub.StartsWith("[ti:") ||
+                        linesub.StartsWith("[ar:") ||
+                        linesub.StartsWith("[al:") ||
+                        linesub.StartsWith("[by:")) continue;
+                    if (linesub.StartsWith("[offset:"))
+                    {
+                        processOffset(linesub);
                         return;
                     }
                     Match wordMatch = lyricWordRegex.Match(line);
                     string word = wordMatch.Groups[1].Value;
+
+                    if (word.Length == 0) word = " ";
 
                     MatchCollection timeMatch = lyricTimeRegex.Matches(line);
                     
                     foreach (Match item in timeMatch)
                     {
                         double time = TimeSpan.Parse("00:" + item.Groups[1].Value).TotalSeconds;
-                        rawLyrics.Add(new RawLyricEntry(time, word));
+                        RawLyricEntry.Line lineNumber = line.StartsWith("l1") ? RawLyricEntry.Line.LINE1 : RawLyricEntry.Line.LINE2;
+                        rawLyrics.Add(new RawLyricEntry(time, word, lineNumber));
                     }
                 }
             }
@@ -147,12 +155,26 @@ namespace iTunesSupportImpl
                 {
                     if (temp.Time == rawLyricEntry.Time)
                     {
-                        temp.LyricLine2 = rawLyricEntry.LyricLine;
+                        if (rawLyricEntry.LineNumber == RawLyricEntry.Line.LINE1)
+                        {
+                            temp.LyricLine1 = rawLyricEntry.LyricLine;
+                        }
+                        else
+                        {
+                            temp.LyricLine2 = rawLyricEntry.LyricLine;
+                        }
                         goto outloop;
                     }
                 }
-            outloop:
-                currentTrackLyrics.Add(new LyricEntry(rawLyricEntry.Time, rawLyricEntry.LyricLine, ""));
+                if (rawLyricEntry.LineNumber == RawLyricEntry.Line.LINE1)
+                {
+                    currentTrackLyrics.Add(new LyricEntry(rawLyricEntry.Time, rawLyricEntry.LyricLine, " "));
+                }
+                else
+                {
+                    currentTrackLyrics.Add(new LyricEntry(rawLyricEntry.Time, " ", rawLyricEntry.LyricLine));
+                }
+            outloop:;
             }
         }
 
@@ -224,7 +246,7 @@ namespace iTunesSupportImpl
 
         public LyricEntry getLyric()
         {
-            if (currentTrackLyrics == null)
+            if (currentTrackLyrics == null || currentTrackLyrics.Count == 0)
                 return ERROR_ENTRY;
             else
             {
@@ -234,18 +256,12 @@ namespace iTunesSupportImpl
                     {
                         return currentTrackLyrics[i - 1];
                     }
-                    else if (i > 0 && i <= currentTrackLyrics.Count)
-                    {
-                        currentTrackLyrics.RemoveAt(i - 1);
-                    }
                 }
                 return currentTrackLyrics[currentTrackLyrics.Count - 1];
             }
         }
 
-        public void writeSomething()
-        {
-            File.AppendAllText("Error.txt", "writesomething");
-        }
+        public void activePointer()
+        {}
     }
 }

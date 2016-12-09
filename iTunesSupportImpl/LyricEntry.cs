@@ -26,11 +26,25 @@ namespace iTunesSupportImpl
     {
         public double Time { get; set; }
         public string LyricLine { get; set; }
+        public Line LineNumber { get; set; }
 
         public RawLyricEntry(double time, string lyricLine)
         {
             Time = time;
             LyricLine = lyricLine;
+            LineNumber = Line.LINE1;
+        }
+
+        public RawLyricEntry(double time, string lyricLine, Line lineNumber)
+        {
+            Time = time;
+            LyricLine = lyricLine;
+            LineNumber = lineNumber;
+        }
+
+        public enum Line
+        {
+            LINE1, LINE2
         }
     }
 

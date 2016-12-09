@@ -14,19 +14,24 @@ using namespace NERvGear;
 
 const UID infoDataUID = { 0xf3594f55, 0xe57c, 0x4988,{ 0xbe, 0x3c, 0x2d, 0xd4, 0xbd, 0x02, 0xc9, 0xa4 } };
 
-iTunesSupportDataSource::iTunesSupportDataSource()
-{
-	infoData = nvg_new iTunesSupportInfoData(this);
-	infoData->AddRef();
-}
+NVG_BEGIN_OBJECT_INFO(iTunesSupportDataSource)
+NVG_DECLARE_OBJECT_CLASSID_UID(ID_CDataSource)
+// {1C0C1731-D190-49F3-B34D-4A69EFD3C249}
+NVG_DECLARE_OBJECT_OBJECTID(0x1c0c1731, 0xd190, 0x49f3, 0xb3, 0x4d, 0x4a, 0x69, 0xef, 0xd3, 0xc2, 0x49)
+NVG_DECLARE_OBJECT_VERSION(1, 0, 0)
+NVG_DECLARE_OBJECT_NAME("iTunes Support")
+NVG_DECLARE_OBJECT_DESCRIP("支持iTunes音乐播放器。")
+NVG_END_OBJECT_INFO()
 
-iTunesSupportDataSource::~iTunesSupportDataSource()
-{
-	infoData->Release();
-}
+NVG_BEGIN_INTERFACE_INFO(iTunesSupportDataSource)
+NVG_DECLARE_INTERFACE(ID_IUnknown, IUnknown, this)
+NVG_DECLARE_INTERFACE(ID_IDataSource, IDataSource, this)
+NVG_END_INTERFACE_INFO()
 
 long NVG_METHOD iTunesSupportDataSource::GetId(NERvGear::UID * id)
 {
+	if (id == NULL)
+		return E_INVALIDARG;
 	*id = srcUID;
 	return S_OK;
 }
@@ -50,11 +55,11 @@ unsigned NVG_METHOD iTunesSupportDataSource::GetDataCount()
 
 long NVG_METHOD iTunesSupportDataSource::GetData(unsigned index, NERvGear::IData ** data)
 {
-	if (index >= 2 || data == NULL)
+	if (index >= 1 || data == NULL)
 		return E_INVALIDARG;
 
 	switch (index) {
-	case 0: *data = infoData; break;
+	case 0: *data = nvg_new iTunesSupportInfoData(this); break;
 	//case 1: *data = nvg_new iTunesSupportInfoControl(this); break;
 	default: return E_FAIL;
 	}
@@ -68,22 +73,18 @@ long iTunesSupportDataSource::FindData(const NERvGear::UID& id, NERvGear::IData 
 
 	if (id == infoDataUID)
 	{
-		*data = infoData;
+		*data = nvg_new iTunesSupportInfoData(this);
 	}
 	else return E_FAIL;
 	return S_OK;
 }
 
-NVG_BEGIN_OBJECT_INFO(iTunesSupportDataSource)
-NVG_DECLARE_OBJECT_CLASSID_UID(ID_CDataSource)
-// {1C0C1731-D190-49F3-B34D-4A69EFD3C249}
-NVG_DECLARE_OBJECT_OBJECTID(0x1c0c1731, 0xd190, 0x49f3, 0xb3, 0x4d, 0x4a, 0x69, 0xef, 0xd3, 0xc2, 0x49)
-NVG_DECLARE_OBJECT_VERSION(1, 0, 0)
-NVG_DECLARE_OBJECT_NAME("iTunes Support")
-NVG_DECLARE_OBJECT_DESCRIP("支持iTunes音乐播放器。")
-NVG_END_OBJECT_INFO()
 
-NVG_BEGIN_INTERFACE_INFO(iTunesSupportDataSource)
-NVG_DECLARE_INTERFACE(ID_IUnknown, IUnknown, this)
-NVG_DECLARE_INTERFACE(ID_IDataSource, IDataSource, this)
-NVG_END_INTERFACE_INFO()
+iTunesSupportDataSource::iTunesSupportDataSource()
+{
+}
+
+iTunesSupportDataSource::~iTunesSupportDataSource()
+{
+}
+
