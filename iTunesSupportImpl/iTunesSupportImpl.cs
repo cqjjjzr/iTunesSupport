@@ -114,19 +114,14 @@ namespace iTunesSupportImpl
                 string line;
                 while((line = reader.ReadLine()) != null)
                 {
-                    if(!line.StartsWith("l1") && !line.StartsWith("l2"))
+                    if (!line.StartsWith("[")) continue;
+                    if (line.StartsWith("[ti:") ||
+                        line.StartsWith("[ar:") ||
+                        line.StartsWith("[al:") ||
+                        line.StartsWith("[by:")) continue;
+                    if (line.StartsWith("[offset:"))
                     {
-                        if (!line.StartsWith("[")) continue;
-                        line = "l1" + line;
-                    }
-                    string linesub = line.Substring(2);
-                    if (linesub.StartsWith("[ti:") ||
-                        linesub.StartsWith("[ar:") ||
-                        linesub.StartsWith("[al:") ||
-                        linesub.StartsWith("[by:")) continue;
-                    if (linesub.StartsWith("[offset:"))
-                    {
-                        processOffset(linesub);
+                        processOffset(line);
                         return;
                     }
                     Match wordMatch = lyricWordRegex.Match(line);
@@ -139,8 +134,7 @@ namespace iTunesSupportImpl
                     foreach (Match item in timeMatch)
                     {
                         double time = TimeSpan.Parse("00:" + item.Groups[1].Value).TotalSeconds;
-                        RawLyricEntry.Line lineNumber = line.StartsWith("l1") ? RawLyricEntry.Line.LINE1 : RawLyricEntry.Line.LINE2;
-                        rawLyrics.Add(new RawLyricEntry(time, word, lineNumber));
+                        rawLyrics.Add(new RawLyricEntry(time, word));
                     }
                 }
             }
@@ -149,33 +143,19 @@ namespace iTunesSupportImpl
 
         private void collapseLyric(List<RawLyricEntry> rawLyrics)
         {
-            rawLyrics.Sort(new RawLyricComparer());
             foreach(RawLyricEntry rawLyricEntry in rawLyrics) {
                 foreach (LyricEntry temp in currentTrackLyrics)
                 {
                     if (temp.Time == rawLyricEntry.Time)
                     {
-                        if (rawLyricEntry.LineNumber == RawLyricEntry.Line.LINE1)
-                        {
-                            temp.LyricLine1 = rawLyricEntry.LyricLine;
-                        }
-                        else
-                        {
-                            temp.LyricLine2 = rawLyricEntry.LyricLine;
-                        }
+                        temp.LyricLine2 = rawLyricEntry.LyricLine;
                         goto outloop;
                     }
                 }
-                if (rawLyricEntry.LineNumber == RawLyricEntry.Line.LINE1)
-                {
-                    currentTrackLyrics.Add(new LyricEntry(rawLyricEntry.Time, rawLyricEntry.LyricLine, " "));
-                }
-                else
-                {
-                    currentTrackLyrics.Add(new LyricEntry(rawLyricEntry.Time, " ", rawLyricEntry.LyricLine));
-                }
+                currentTrackLyrics.Add(new LyricEntry(rawLyricEntry.Time, rawLyricEntry.LyricLine, " "));
             outloop:;
             }
+            currentTrackLyrics.Sort(new LyricEntry.LyricEntryComparer());
         }
 
         private void processOffset(string line)

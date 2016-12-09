@@ -20,39 +20,25 @@ namespace iTunesSupportImpl
         {
             return "[Lyric time=" + Time + " line1=" + LyricLine1 + " line2=" + LyricLine2 + "]\r";
         }
+
+        public class LyricEntryComparer : Comparer<LyricEntry>
+        {
+            public override int Compare(LyricEntry x, LyricEntry y)
+            {
+                return (int)(x.Time - y.Time);
+            }
+        }
     }
     
     public class RawLyricEntry
     {
         public double Time { get; set; }
         public string LyricLine { get; set; }
-        public Line LineNumber { get; set; }
 
         public RawLyricEntry(double time, string lyricLine)
         {
             Time = time;
             LyricLine = lyricLine;
-            LineNumber = Line.LINE1;
-        }
-
-        public RawLyricEntry(double time, string lyricLine, Line lineNumber)
-        {
-            Time = time;
-            LyricLine = lyricLine;
-            LineNumber = lineNumber;
-        }
-
-        public enum Line
-        {
-            LINE1, LINE2
-        }
-    }
-
-    public class RawLyricComparer : IComparer<RawLyricEntry>
-    {
-        public int Compare(RawLyricEntry x, RawLyricEntry y)
-        {
-            return (int) (x.Time - y.Time);
         }
     }
 }
