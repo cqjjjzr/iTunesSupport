@@ -29,6 +29,8 @@ namespace iTunesSupportImpl
         private IiTunes iTunes;
         private IITTrack currentTrack;
 
+        private int updateTimes = 0;
+
         //private IITTrack currentLyricsDictionaryTrack;
         private double lyricOffset;
         public List<LyricEntry> currentTrackLyrics;
@@ -53,16 +55,16 @@ namespace iTunesSupportImpl
         {
             try
             {
-#if DEBUG
-                File.AppendAllText("Error.txt", "Entry update()");
-#endif
                 IITTrack prev = currentTrack;
                 currentTrack = iTunes.CurrentTrack;
                 if (prev != null && currentTrack != null && (currentTrack.Name != prev.Name || currentTrack.Size != prev.Size))
                     updateLyrics();
-#if DEBUG
-                File.AppendAllText("Error.txt", "Exit update()");
-#endif
+                updateTimes++;
+                if (updateTimes >= 10)
+                {
+                    updateTimes = 0;
+                    updateLyrics();
+                }
                 return SUCCESS;
             } catch (Exception ex)
             {
@@ -77,9 +79,6 @@ namespace iTunesSupportImpl
             if (!(currentTrack is IITFileOrCDTrack))
             {
                 currentTrackLyrics = null;
-#if DEBUG
-                Console.WriteLine("!(currentTrack is IITFileOrCDTrack)");
-#endif
                 return SUCCESS;
             }
 

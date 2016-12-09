@@ -155,14 +155,14 @@ size_t NVG_METHOD iTunesSupportInfoData::GetValueName(unsigned index, size_t len
 size_t NVG_METHOD iTunesSupportInfoData::GetValueDescrip(unsigned index, size_t len, wchar_t * descrip)
 {
 	switch (index) {
-	case 0: return NERvCopyString(L"获取当前音乐播放进度，建议以1ms为更新间隔。", len, descrip);
-	case 1: return NERvCopyString(L"获取当前音乐播放时间，建议以1ms为更新间隔。", len, descrip);
+	case 0: return NERvCopyString(L"获取当前音乐播放进度，建议以100ms为更新间隔。", len, descrip);
+	case 1: return NERvCopyString(L"获取当前音乐播放时间，建议以100ms为更新间隔。", len, descrip);
 	case 2: return NERvCopyString(L"获取当前音乐标题，建议以1s为更新间隔。", len, descrip);
 	case 3: return NERvCopyString(L"获取当前音乐表演者，建议以1s为更新间隔。", len, descrip);
 	case 4: return NERvCopyString(L"获取当前音乐专辑，建议以1s为更新间隔。", len, descrip);
 	case 5: return NERvCopyString(L"获取当前音量。", len, descrip);
-	case 6: return NERvCopyString(L"获取LRC中相同时间的标签中的第一次出现的歌词。建议以50ms为更新间隔。\n歌词来自于iTunes中歌曲的“歌词”标签，且要求使用LRC格式。", len, descrip);
-	case 7: return NERvCopyString(L"获取LRC中相同时间的标签中的第二次出现的歌词。建议以50ms为更新间隔。\n歌词来自于iTunes中歌曲的“歌词”标签，且要求使用LRC格式。", len, descrip);
+	case 6: return NERvCopyString(L"获取LRC中相同时间的标签中的第一次出现的歌词。建议以100ms为更新间隔。\n歌词来自于iTunes中歌曲的“歌词”标签，且要求使用LRC格式。", len, descrip);
+	case 7: return NERvCopyString(L"获取LRC中相同时间的标签中的第二次出现的歌词。建议以100ms为更新间隔。\n歌词来自于iTunes中歌曲的“歌词”标签，且要求使用LRC格式。", len, descrip);
 	default:return 0;
 	}
 }
@@ -170,14 +170,14 @@ size_t NVG_METHOD iTunesSupportInfoData::GetValueDescrip(unsigned index, size_t 
 unsigned NVG_METHOD iTunesSupportInfoData::GetUpdateInterval(unsigned index)
 {
 	switch (index) {
-	case 0: return 1;
-	case 1: return 1;
+	case 0: return 100;
+	case 1: return 100;
 	case 2: return 1000;
 	case 3: return 1000;
 	case 4: return 1000;
 	case 5: return 5;
-	case 6: return 50;
-	case 7: return 50;
+	case 6: return 100;
+	case 7: return 100;
 	default:return 0;
 	}
 }
