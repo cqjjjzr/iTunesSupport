@@ -2,6 +2,7 @@
 #define ITS_ITUNES_SUPPORT_INFO_DATA
 #include <NERvGear\template.h>
 #include <NERvGear\interface\IData.h>
+#include <vcclr.h>
 
 using namespace NERvGear;
 
@@ -48,5 +49,6 @@ public:
 
 private:
 	iTunesSupportDataSource* parentSource;
+	gcroot<System::String^> artworkRootPath;
 };
 #endif

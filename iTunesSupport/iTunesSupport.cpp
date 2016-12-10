@@ -8,6 +8,7 @@
 
 #include <io.h>
 #include <Windows.h>
+#include <direct.h>
 
 #include "iTunesSupport.h"
 #include "iTunesSupportDataSource.h"
@@ -21,12 +22,23 @@ using namespace NERvGear;
 
 int IsiTunesLibExists();
 
+char* WcharToChar(const wchar_t* wp)
+{
+	char *m_char;
+	int len = WideCharToMultiByte(CP_ACP, 0, wp, wcslen(wp), NULL, 0, NULL, NULL);
+	m_char = new char[len + 1];
+	WideCharToMultiByte(CP_ACP, 0, wp, wcslen(wp), m_char, len, NULL, NULL);
+	m_char[len] = '\0';
+	return m_char;
+}
+
 long NVG_METHOD iTunesSupport::OnInitial()
 {
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), L"iTunes Support ver%d.%d.%d"
 		, ITS_VERSION_MAJOR, ITS_VERSION_MINOR, ITS_VERSION_SUBMINOR);
 	if (!CoInitialize(NULL)) return E_FAIL;
 	if (!PrepareiTunesLib()) return E_FAIL;
+	_mkdir((string(WcharToChar(NERvGetModulePath())) + "\\artworks").c_str());
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Initialized."));
 
 	return PluginImpl::OnInitial();

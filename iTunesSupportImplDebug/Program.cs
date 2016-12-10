@@ -11,15 +11,7 @@ namespace iTunesSupportImplDebug
             iTunesSupportImplWrapper wrapper = iTunesSupportImplWrapper.getInstance();
             wrapper.init();
             wrapper.update();
-            wrapper.updateLyrics();
-            /*foreach(LyricEntry entry in wrapper.currentTrackLyrics) {
-                Console.Write(entry);
-            }*/
-            while(true)
-            {
-                Console.Write(wrapper.currentTrackLyrics.Count + " "  + wrapper.getLyric());
-                Thread.Sleep(50);
-            }
+            Console.WriteLine(wrapper.getArtworkFileName("E:\\iTunes\\"));
         }
     }
 }
