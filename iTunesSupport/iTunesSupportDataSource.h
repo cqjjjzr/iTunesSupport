@@ -6,6 +6,7 @@
 #include <NERvGear/interface/IDataSource.h>
 #include <NERvGear/object.h>
 #include <NERvGear\template.h>
+#include "utils.h"
 
 using namespace NERvGear;
 

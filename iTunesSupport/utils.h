@@ -1,10 +1,12 @@
-#pragma once
-
 #ifndef ITS_UTILS
 #define ITS_UTILS
 
 #include <string>
+#include <NERvGear/string.h>
+#include <NERvGear/NERvSDK.h>
+#include <vcclr.h>
 
+using namespace NERvGear;
 using namespace std;
 
 inline size_t WriteString(size_t len, const wchar_t* str, wchar_t *dest) {
@@ -16,8 +18,7 @@ inline size_t WriteString(size_t len, const wchar_t* str, wchar_t *dest) {
 	return sizeof(str);
 }
 
-
-size_t writeCSharpStringToValue(System::String ^value, size_t nbyte, void* buf) {
+inline size_t writeCSharpStringToValue(System::String ^value, size_t nbyte, void* buf) {
 	pin_ptr<const wchar_t> pinchars = PtrToStringChars(value);
 	int res = NERvCopyString(pinchars, nbyte / 2, static_cast<wchar_t*>(buf)) * 2;
 	pinchars = nullptr;

@@ -1,12 +1,11 @@
 #using "C:\Users\cqjjj\Documents\Visual Studio 2015\Projects\iTunesSupport\iTunesSupportImpl\bin\Debug\iTunesSupportImpl.dll"
 
 #include "iTunesSupportControlData.h"
-#include "iTunesSupportDataSource.h";
+#include "iTunesSupportDataSource.h"
 #include "vcclr.h"
 #include <NERvGear/string.h>
 #include <NERvGear\plugin.h>
 #include <NERvGear\NERvSDK.h>
-#include "utils.h"
 
 using namespace iTunesSupportImpl;
 using namespace std;

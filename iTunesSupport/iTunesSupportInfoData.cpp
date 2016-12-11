@@ -1,6 +1,5 @@
 #using "C:\Users\cqjjj\Documents\Visual Studio 2015\Projects\iTunesSupport\iTunesSupportImpl\bin\Debug\iTunesSupportImpl.dll"
 #include "iTunesSupportInfoData.h"
-#include "utils.h"
 #include "vcclr.h"
 #include <NERvGear/string.h>
 #include <NERvGear\plugin.h>
@@ -49,7 +48,6 @@ unsigned NVG_METHOD iTunesSupportInfoData::GetValueCount()
 	return 9;
 }
 
-size_t writeCSharpStringToValue(System::String ^value, size_t nbyte, void* buf);
 size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, void * buf)
 {
 	switch (index) {
