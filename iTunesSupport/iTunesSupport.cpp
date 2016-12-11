@@ -1,4 +1,5 @@
 #using "C:\Users\cqjjj\Documents\Visual Studio 2015\Projects\iTunesSupport\iTunesSupportImpl\bin\Debug\iTunesSupportImpl.dll"
+//#define _CRTDBG_MAP_ALLOC
 #include <NERvGear\plugin.h>
 #include <NERvGear\NERvSDK.h>
 #include <NERvGear\COM.h>
@@ -9,6 +10,7 @@
 #include <io.h>
 #include <Windows.h>
 #include <direct.h>
+//#include <crtdbg.h>
 
 #include "iTunesSupport.h"
 #include "iTunesSupportDataSource.h"
@@ -32,8 +34,14 @@ char* WcharToChar(const wchar_t* wp)
 	return m_char;
 }
 
+//#ifdef _DEBUG
+//#undef nvg_new
+//#define nvg_new   new(_NORMAL_BLOCK, __FILE__, __LINE__)
+//#endif
+
 long NVG_METHOD iTunesSupport::OnInitial()
 {
+	//_CrtSetBreakAlloc(185);
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), L"iTunes Support ver%d.%d.%d"
 		, ITS_VERSION_MAJOR, ITS_VERSION_MINOR, ITS_VERSION_SUBMINOR);
 	if (!CoInitialize(NULL)) return E_FAIL;
@@ -53,6 +61,7 @@ long NVG_METHOD iTunesSupport::OnRelease()
 {
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Unloading iTunes Support"));
 	iTunesSupportImplWrapper::getInstance()->destroy();
+	//_CrtDumpMemoryLeaks();
 	return PluginImpl::OnRelease();
 }
 

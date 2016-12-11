@@ -185,6 +185,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="iTunesSupportControlData.h" />
     <ClInclude Include="iTunesSupportDataSource.h" />
     <ClInclude Include="iTunesSupport.h" />
     <ClInclude Include="iTunesSupportInfoData.h" />
@@ -194,6 +195,7 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="iTunesSupportControlData.cpp" />
     <ClCompile Include="iTunesSupportDataSource.cpp" />
     <ClCompile Include="iTunesSupport.cpp" />
     <ClCompile Include="iTunesSupportInfoData.cpp" />

@@ -8,6 +8,7 @@
 
 #include "utils.h"
 #include "iTunesSupportInfoData.h"
+#include "iTunesSupportControlData.h"
 
 using namespace std;
 using namespace NERvGear;
@@ -50,17 +51,18 @@ size_t NVG_METHOD iTunesSupportDataSource::GetDescrip(size_t len, wchar_t * desc
 
 unsigned NVG_METHOD iTunesSupportDataSource::GetDataCount()
 {
-	return 1;
+	return 2;
+	//return 1;
 }
 
 long NVG_METHOD iTunesSupportDataSource::GetData(unsigned index, NERvGear::IData ** data)
 {
-	if (index >= 1 || data == NULL)
+	if (index > 1 || data == NULL)
 		return E_INVALIDARG;
 
 	switch (index) {
 	case 0: *data = nvg_new iTunesSupportInfoData(this); break;
-	//case 1: *data = nvg_new iTunesSupportInfoControl(this); break;
+	case 1: *data = nvg_new iTunesSupportControlData(this); break;
 	default: return E_FAIL;
 	}
 	return S_OK;
@@ -74,6 +76,9 @@ long iTunesSupportDataSource::FindData(const NERvGear::UID& id, NERvGear::IData 
 	if (id == infoDataUID)
 	{
 		*data = nvg_new iTunesSupportInfoData(this);
+	}
+	else if (id == iTunesSupportControlData::dataUID) {
+		*data = nvg_new iTunesSupportControlData(this);
 	}
 	else return E_FAIL;
 	return S_OK;

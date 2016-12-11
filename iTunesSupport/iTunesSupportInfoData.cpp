@@ -195,7 +195,7 @@ long NVG_METHOD iTunesSupportInfoData::Update(unsigned index, const wchar_t * pa
 		return E_INVALIDARG;
 	iTunesSupportImplWrapper^ wrapper = iTunesSupportImplWrapper::getInstance();
 	wrapper->activePointer();
-	wrapper->update();
+	if (!wrapper->update()) return E_FAIL;
 	wstring paramStr = wstring(param);
 	if (index == 2 && !wcsncmp(param, L"roll", 4)) {
 		wrapper->rollTrackName = true;
@@ -282,6 +282,7 @@ iTunesSupportInfoData::iTunesSupportInfoData(iTunesSupportDataSource* dataSource
 	char rootPtr[100];
 	sprintf(rootPtr, "%s\\artworks\\", WcharToChar(NERvGetModulePath()));
 	System::String^ str = gcnew System::String(rootPtr);
+	free(rootPtr);
 	artworkRootPath = str;
 }
 

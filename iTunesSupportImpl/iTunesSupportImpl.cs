@@ -170,19 +170,31 @@ namespace iTunesSupportImpl
         public int rollTrackLimit = 10;
         public string getTrackName()
         {
-            if (currentTrack == null)
-                return "当前没有正在播放的曲目...";
-            else
+            try
             {
-                if (!rollTrackName) return currentTrack.Name;
-                if (currentTrack.Name.Length < rollTrackLimit) return currentTrack.Name;
-                string temp = currentTrack.Name;
-                if (trackNameRoll > temp.Length)
-                    trackNameRoll = 0;
-                string final = temp.Substring(trackNameRoll) + "   " + temp.Substring(0, trackNameRoll);
-                trackNameRoll++;
-                return final;
+                if (currentTrack == null)
+                    return "当前没有正在播放的曲目...";
+                else
+                {
+                    if (!rollTrackName) return currentTrack.Name;
+                    if (currentTrack.Name.Length < rollTrackLimit) return currentTrack.Name;
+                    string temp = currentTrack.Name;
+                    if (trackNameRoll > temp.Length)
+                        trackNameRoll = 0;
+                    string final = temp.Substring(trackNameRoll) + "   " + temp.Substring(0, trackNameRoll);
+                    trackNameRoll++;
+                    return final;
+                }
+            } catch (Exception ex)
+            {
+#if DEBUG
+                File.WriteAllText("error.txt", ex.ToString() + "\n");
+                File.WriteAllText("error.txt", ex.StackTrace + "\n");
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.StackTrace);
+#endif
             }
+            return "";
         }
 
         int trackArtistRoll = 0;
@@ -190,19 +202,31 @@ namespace iTunesSupportImpl
         public int rollArtistLimit = 10;
         public string getTrackArtist()
         {
-            if (currentTrack == null)
-                return "";
-            else
+            try
             {
-                if (!rollArtist) return currentTrack.Artist;
-                if (currentTrack.Artist.Length < rollArtistLimit) return currentTrack.Artist;
-                string temp = currentTrack.Artist;
-                if (trackArtistRoll > temp.Length)
-                    trackArtistRoll = 0;
-                string final = temp.Substring(trackArtistRoll) + "   " + temp.Substring(0, trackArtistRoll);
-                trackArtistRoll++;
-                return final;
+                if (currentTrack == null)
+                    return "";
+                else
+                {
+                    if (!rollArtist) return currentTrack.Artist;
+                    if (currentTrack.Artist.Length < rollArtistLimit) return currentTrack.Artist;
+                    string temp = currentTrack.Artist;
+                    if (trackArtistRoll > temp.Length)
+                        trackArtistRoll = 0;
+                    string final = temp.Substring(trackArtistRoll) + "   " + temp.Substring(0, trackArtistRoll);
+                    trackArtistRoll++;
+                    return final;
+                }
+            } catch (Exception ex)
+            {
+#if DEBUG
+                File.WriteAllText("error.txt", ex.ToString() + "\n");
+                File.WriteAllText("error.txt", ex.StackTrace + "\n");
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.StackTrace);
+#endif
             }
+            return "";
         }
 
         int trackAlbumRoll = 0;
@@ -210,19 +234,31 @@ namespace iTunesSupportImpl
         public int rollAlbumLimit = 10;
         public string getTrackAlbum()
         {
-            if (currentTrack == null)
-                return "";
-            else
+            try
             {
-                if (!rollAlbum) return currentTrack.Album;
-                if (currentTrack.Album.Length < rollAlbumLimit) return currentTrack.Album;
-                string temp = currentTrack.Album;
-                if (trackAlbumRoll > temp.Length)
-                    trackAlbumRoll = 0;
-                string final = temp.Substring(trackAlbumRoll) + "   " + temp.Substring(0, trackAlbumRoll);
-                trackAlbumRoll++;
-                return final;
+                if (currentTrack == null)
+                    return "";
+                else
+                {
+                    if (!rollAlbum) return currentTrack.Album;
+                    if (currentTrack.Album.Length < rollAlbumLimit) return currentTrack.Album;
+                    string temp = currentTrack.Album;
+                    if (trackAlbumRoll > temp.Length)
+                        trackAlbumRoll = 0;
+                    string final = temp.Substring(trackAlbumRoll) + "   " + temp.Substring(0, trackAlbumRoll);
+                    trackAlbumRoll++;
+                    return final;
+                }
+            } catch (Exception ex)
+            {
+#if DEBUG
+                File.WriteAllText("error.txt", ex.ToString() + "\n");
+                File.WriteAllText("error.txt", ex.StackTrace + "\n");
+                Console.WriteLine(ex.ToString());
+                Console.WriteLine(ex.StackTrace);
+#endif
             }
+            return "";
         }
 
         public int getPlaybackProgressInSecond()
@@ -281,22 +317,44 @@ namespace iTunesSupportImpl
 
         public string getArtworkFileName(string rootpath)
         {
-            if (currentTrack == null)
-                return "";
-            IITArtworkCollection artworks = currentTrack.Artwork;
-            if (artworks.Count == 0) return "";
-            string suffix;
-            switch (artworks[1].Format)
+            try
             {
-                case ITArtworkFormat.ITArtworkFormatBMP: suffix = ".bmp"; break;
-                case ITArtworkFormat.ITArtworkFormatJPEG: suffix = ".jpg"; break;
-                case ITArtworkFormat.ITArtworkFormatPNG: suffix = ".png"; break;
-                default: suffix = ".jpg";break;
+                if (currentTrack == null)
+                    return "";
+                IITArtworkCollection artworks = currentTrack.Artwork;
+                if (artworks.Count == 0) return "";
+                string suffix;
+                switch (artworks[1].Format)
+                {
+                    case ITArtworkFormat.ITArtworkFormatBMP: suffix = ".bmp"; break;
+                    case ITArtworkFormat.ITArtworkFormatJPEG: suffix = ".jpg"; break;
+                    case ITArtworkFormat.ITArtworkFormatPNG: suffix = ".png"; break;
+                    default: suffix = ".jpg"; break;
+                }
+                string filepath = rootpath + replaceInvalidChars(currentTrack.Artist) + " - " +
+                    replaceInvalidChars(currentTrack.Album) + suffix;
+                if (!File.Exists(filepath))
+                    artworks[1].SaveArtworkToFile(filepath);
+                return filepath;
             }
-            string filepath = rootpath + currentTrack.Artist + " - " + currentTrack.Album + suffix;
-            if (!File.Exists(filepath))
-                artworks[1].SaveArtworkToFile(filepath);
-            return filepath;
+            catch (Exception)
+            { }
+            return "";
+        }
+
+        private string replaceInvalidChars(string originStr)
+        {
+            StringBuilder str = new StringBuilder(originStr);
+            str.Replace('\\', '_');
+            str.Replace('/', '_');
+            str.Replace('|', '_');
+            str.Replace(':', '_');
+            str.Replace('?', '_');
+            str.Replace('\"', '_');
+            str.Replace('<', '_');
+            str.Replace('>', '_');
+            str.Replace('*', '_');
+            return str.ToString();
         }
 
         public void playPause()
