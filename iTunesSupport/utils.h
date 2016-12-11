@@ -15,4 +15,13 @@ inline size_t WriteString(size_t len, const wchar_t* str, wchar_t *dest) {
 	wcscpy(dest, str);
 	return sizeof(str);
 }
+
+
+size_t writeCSharpStringToValue(System::String ^value, size_t nbyte, void* buf) {
+	pin_ptr<const wchar_t> pinchars = PtrToStringChars(value);
+	int res = NERvCopyString(pinchars, nbyte / 2, static_cast<wchar_t*>(buf)) * 2;
+	pinchars = nullptr;
+	System::GC::Collect();
+	return res;
+}
 #endif

@@ -49,7 +49,7 @@ unsigned NVG_METHOD iTunesSupportInfoData::GetValueCount()
 	return 9;
 }
 
-size_t writeValue(System::String ^value, size_t nbyte, void* buf);
+size_t writeCSharpStringToValue(System::String ^value, size_t nbyte, void* buf);
 size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, void * buf)
 {
 	switch (index) {
@@ -59,22 +59,15 @@ size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, 
 	case 0: 
 		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->getPlaybackProgressInSecond();
 		return sizeof(unsigned);
-	case 1: return writeValue(iTunesSupportImplWrapper::getInstance()->getPlaybackProgressFormatted(), nbyte, buf);
-	case 2: return writeValue(iTunesSupportImplWrapper::getInstance()->getTrackName(), nbyte, buf);
-	case 3: return writeValue(iTunesSupportImplWrapper::getInstance()->getTrackArtist(), nbyte, buf);
-	case 4: return writeValue(iTunesSupportImplWrapper::getInstance()->getTrackAlbum(), nbyte, buf);
-	case 6: return writeValue(iTunesSupportImplWrapper::getInstance()->getLyric()->LyricLine1, nbyte, buf);
-	case 7: return writeValue(iTunesSupportImplWrapper::getInstance()->getLyric()->LyricLine2, nbyte, buf);
-	case 8: return writeValue(iTunesSupportImplWrapper::getInstance()->getArtworkFileName(artworkRootPath), nbyte, buf);
+	case 1: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getPlaybackProgressFormatted(), nbyte, buf);
+	case 2: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getTrackName(), nbyte, buf);
+	case 3: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getTrackArtist(), nbyte, buf);
+	case 4: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getTrackAlbum(), nbyte, buf);
+	case 6: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getLyric()->LyricLine1, nbyte, buf);
+	case 7: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getLyric()->LyricLine2, nbyte, buf);
+	case 8: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getArtworkFileName(artworkRootPath), nbyte, buf);
 	default:return 0;
 	}
-}
-
-size_t writeValue(System::String ^value, size_t nbyte, void* buf) {
-	pin_ptr<const wchar_t> pinchars = PtrToStringChars(value);
-	int res = NERvCopyString(pinchars, nbyte / 2, static_cast<wchar_t*>(buf)) * 2;
-	pinchars = nullptr;
-	return res;
 }
 
 size_t NVG_METHOD iTunesSupportInfoData::GetMaximum(unsigned index, size_t nbyte, void * buf)
@@ -191,6 +184,7 @@ unsigned NVG_METHOD iTunesSupportInfoData::GetUpdateInterval(unsigned index)
 
 long NVG_METHOD iTunesSupportInfoData::Update(unsigned index, const wchar_t * param)
 {
+	//NO MEMORY LEAK!
 	if (index >= 9)
 		return E_INVALIDARG;
 	iTunesSupportImplWrapper^ wrapper = iTunesSupportImplWrapper::getInstance();
@@ -282,7 +276,6 @@ iTunesSupportInfoData::iTunesSupportInfoData(iTunesSupportDataSource* dataSource
 	char rootPtr[100];
 	sprintf(rootPtr, "%s\\artworks\\", WcharToChar(NERvGetModulePath()));
 	System::String^ str = gcnew System::String(rootPtr);
-	free(rootPtr);
 	artworkRootPath = str;
 }
 
@@ -292,4 +285,5 @@ iTunesSupportInfoData::~iTunesSupportInfoData()
 	if (parentSource)
 		parentSource->Release();
 	parentSource = nullptr;
+	artworkRootPath = nullptr;
 }

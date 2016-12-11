@@ -52,7 +52,6 @@ size_t NVG_METHOD iTunesSupportDataSource::GetDescrip(size_t len, wchar_t * desc
 unsigned NVG_METHOD iTunesSupportDataSource::GetDataCount()
 {
 	return 2;
-	//return 1;
 }
 
 long NVG_METHOD iTunesSupportDataSource::GetData(unsigned index, NERvGear::IData ** data)
