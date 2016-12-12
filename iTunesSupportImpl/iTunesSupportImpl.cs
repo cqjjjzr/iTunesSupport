@@ -29,6 +29,7 @@ namespace iTunesSupportImpl
         private IiTunes iTunes;
         private IITTrack currentTrack;
         private bool connectDown;
+        private int pid;
 
         private int updateTimes = 0;
 
@@ -51,7 +52,7 @@ namespace iTunesSupportImpl
         {
             try
             {
-                iTunes = new iTunesAppClass();
+                tryEstablishConnect();
                 artworkRootPath = rootpath + "\\artworks\\";
             } catch (Exception)
             {
@@ -119,19 +120,16 @@ namespace iTunesSupportImpl
 
         private void tryEstablishConnect()
         {
-            bool flag = false;
-            again:
-            if (Process.GetProcessesByName("iTunes").Length != 0)
+            Process[] processes = Process.GetProcessesByName("iTunes");
+            if (processes.Length != 0 && processes[0].Id != pid)
             {
-                if (flag)
-                {
-                    iTunes = new iTunesAppClass();
-                    connectDown = false;
-                    return;
-                }
-                Thread.Sleep(10000);
-                flag = true;
-                goto again;
+                pid = processes[0].Id;
+                iTunes = new iTunesAppClass();
+                connectDown = false;
+            } else
+            {
+                connectDown = true;
+                trackName = getTrackNameInternal();
             }
         }
 
