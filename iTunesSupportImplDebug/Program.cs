@@ -9,9 +9,9 @@ namespace iTunesSupportImplDebug
         static void Main(string[] args)
         {
             iTunesSupportImplWrapper wrapper = iTunesSupportImplWrapper.getInstance();
-            wrapper.init();
-            wrapper.update();
-            Console.WriteLine(wrapper.getArtworkFileName("E:\\iTunes\\"));
+            //wrapper.init();
+            //wrapper.update();
+            //Console.WriteLine(wrapper.getArtworkFileName("E:\\iTunes\\"));
         }
     }
 }

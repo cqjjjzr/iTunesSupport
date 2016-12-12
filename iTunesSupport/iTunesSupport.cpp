@@ -9,7 +9,6 @@
 #include <io.h>
 #include <Windows.h>
 #include <direct.h>
-#include <crtdbg.h>
 
 #include "iTunesSupport.h"
 #include "iTunesSupportDataSource.h"
@@ -33,16 +32,13 @@ char* WcharToChar(const wchar_t* wp)
 	return m_char;
 }
 
-#ifdef _DEBUG
-#define nvg_new new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#endif
-
 long NVG_METHOD iTunesSupport::OnInitial()
 {
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), L"iTunes Support ver%d.%d.%d"
 		, ITS_VERSION_MAJOR, ITS_VERSION_MINOR, ITS_VERSION_SUBMINOR);
 	if (!CoInitialize(NULL)) return E_FAIL;
 	if (!PrepareiTunesLib()) return E_FAIL;
+	iTunesSupportImpl::iTunesSupportImplWrapper::getInstance()->init(gcnew System::String(NERvGetModulePath()));
 	_mkdir((string(WcharToChar(NERvGetModulePath())) + "\\artworks").c_str());
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Initialized."));
 
@@ -58,7 +54,6 @@ long NVG_METHOD iTunesSupport::OnRelease()
 {
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Unloading iTunes Support"));
 	iTunesSupportImplWrapper::getInstance()->destroy();
-	_CrtDumpMemoryLeaks();
 	return PluginImpl::OnRelease();
 }
 

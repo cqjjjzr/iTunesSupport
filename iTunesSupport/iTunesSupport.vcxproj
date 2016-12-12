@@ -109,6 +109,7 @@
       <AdditionalDependencies>NERvRES.lib;NERvSDK.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OptimizeReferences>true</OptimizeReferences>
       <ModuleDefinitionFile>$(SolutionDir)exports.def</ModuleDefinitionFile>
+      <OutputFile>$(OutDir)module32.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -156,6 +157,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>NERvRES.lib;NERvSDK.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>$(SolutionDir)exports.def</ModuleDefinitionFile>
+      <OutputFile>$(OutDir)module32.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

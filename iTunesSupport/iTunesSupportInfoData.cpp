@@ -52,18 +52,18 @@ size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, 
 {
 	switch (index) {
 	case 5:
-		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->getVolume();
+		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->volume;
 		return sizeof(unsigned);
 	case 0: 
-		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->getPlaybackProgressInSecond();
+		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->progressSecond;
 		return sizeof(unsigned);
-	case 1: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getPlaybackProgressFormatted(), nbyte, buf);
-	case 2: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getTrackName(), nbyte, buf);
-	case 3: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getTrackArtist(), nbyte, buf);
-	case 4: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getTrackAlbum(), nbyte, buf);
-	case 6: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getLyric()->LyricLine1, nbyte, buf);
-	case 7: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getLyric()->LyricLine2, nbyte, buf);
-	case 8: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->getArtworkFileName(artworkRootPath), nbyte, buf);
+	case 1: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->progressFormatted, nbyte, buf);
+	case 2: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->trackName, nbyte, buf);
+	case 3: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->trackArtist, nbyte, buf);
+	case 4: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->trackAlbum, nbyte, buf);
+	case 6: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->lyric->LyricLine1, nbyte, buf);
+	case 7: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->lyric->LyricLine2, nbyte, buf);
+	case 8: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->cover, nbyte, buf);
 	default:return 0;
 	}
 }
@@ -75,7 +75,7 @@ size_t NVG_METHOD iTunesSupportInfoData::GetMaximum(unsigned index, size_t nbyte
 		*reinterpret_cast<unsigned*>(buf) = 100;
 		return sizeof(unsigned);
 	case 0:
-		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->getTrackLengthInSecond();
+		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->trackLength;
 		return sizeof(unsigned);
 	default:return 0;
 	}
@@ -187,51 +187,7 @@ long NVG_METHOD iTunesSupportInfoData::Update(unsigned index, const wchar_t * pa
 		return E_INVALIDARG;
 	iTunesSupportImplWrapper^ wrapper = iTunesSupportImplWrapper::getInstance();
 	wrapper->activePointer();
-	if (!wrapper->update()) return E_FAIL;
-	wstring paramStr = wstring(param);
-	if (index == 2 && !wcsncmp(param, L"roll", 4)) {
-		wrapper->rollTrackName = true;
-		if (paramStr.length() > 4) {
-			wstringstream sstream = wstringstream(paramStr.substr(5));
-			int limit;
-			sstream >> limit;
-			if (sstream.good()) {
-				wrapper->rollTrackLimit = limit;
-			}
-			else wrapper->rollTrackLimit = 10;
-		}
-		else wrapper->rollTrackLimit = 10;
-	}
-	else
-		wrapper->rollTrackName = false;
-	if (index == 3 && !wcsncmp(param, L"roll", 4)) {
-		wrapper->rollArtist = true;
-		if (paramStr.length() > 4) {
-			wstringstream sstream = wstringstream(paramStr.substr(5));
-			int limit;
-			sstream >> limit;
-			if (sstream.good()) {
-				wrapper->rollArtistLimit = limit;
-			} else wrapper->rollArtistLimit = 10;
-		} else wrapper->rollArtistLimit = 10;
-	}
-	else
-		wrapper->rollArtist = false;
-	if (index == 4 && !wcsncmp(param, L"roll", 4)) {
-		wrapper->rollAlbum = true;
-		if (paramStr.length() > 4) {
-			wstringstream sstream = wstringstream(paramStr.substr(5));
-			int limit;
-			sstream >> limit;
-			if (sstream.good()) {
-				wrapper->rollAlbumLimit = limit;
-			}
-			else wrapper->rollAlbumLimit = 10;
-		}
-		else wrapper->rollAlbumLimit = 10;
-	}
-	else
-		wrapper->rollAlbum = false;
+	if (!wrapper->update(index, gcnew System::String(param))) return E_FAIL;
 	return S_OK;
 }
 
@@ -266,15 +222,10 @@ long NVG_METHOD iTunesSupportInfoData::SetEventListener(NERvGear::IEventHandler 
 	return E_NOTIMPL;
 }
 
-char* WcharToChar(const wchar_t*);
 iTunesSupportInfoData::iTunesSupportInfoData(iTunesSupportDataSource* dataSource) : parentSource(dataSource)
 {
 	if (parentSource)
 		parentSource->AddRef();
-	char rootPtr[100];
-	sprintf(rootPtr, "%s\\artworks\\", WcharToChar(NERvGetModulePath()));
-	System::String^ str = gcnew System::String(rootPtr);
-	artworkRootPath = str;
 }
 
 
@@ -283,5 +234,4 @@ iTunesSupportInfoData::~iTunesSupportInfoData()
 	if (parentSource)
 		parentSource->Release();
 	parentSource = nullptr;
-	artworkRootPath = nullptr;
 }

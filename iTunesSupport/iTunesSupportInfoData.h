@@ -49,6 +49,5 @@ public:
 
 private:
 	iTunesSupportDataSource* parentSource;
-	gcroot<System::String^> artworkRootPath;
 };
 #endif

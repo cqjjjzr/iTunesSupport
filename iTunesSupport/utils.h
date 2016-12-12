@@ -22,7 +22,6 @@ inline size_t writeCSharpStringToValue(System::String ^value, size_t nbyte, void
 	pin_ptr<const wchar_t> pinchars = PtrToStringChars(value);
 	int res = NERvCopyString(pinchars, nbyte / 2, static_cast<wchar_t*>(buf)) * 2;
 	pinchars = nullptr;
-	System::GC::Collect();
 	return res;
 }
 #endif
