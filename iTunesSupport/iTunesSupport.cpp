@@ -21,6 +21,7 @@ using namespace std;
 using namespace NERvGear;
 
 int IsiTunesLibExists();
+void initiTunesLib();
 
 char* WcharToChar(const wchar_t* wp)
 {
@@ -38,7 +39,7 @@ long NVG_METHOD iTunesSupport::OnInitial()
 		, ITS_VERSION_MAJOR, ITS_VERSION_MINOR, ITS_VERSION_SUBMINOR);
 	if (!CoInitialize(NULL)) return E_FAIL;
 	if (!PrepareiTunesLib()) return E_FAIL;
-	iTunesSupportImpl::iTunesSupportImplWrapper::getInstance()->init(gcnew System::String(NERvGetModulePath()));
+	initiTunesLib();
 	_mkdir((string(WcharToChar(NERvGetModulePath())) + "\\artworks").c_str());
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Initialized."));
 
@@ -55,6 +56,10 @@ long NVG_METHOD iTunesSupport::OnRelease()
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Unloading iTunes Support"));
 	iTunesSupportImplWrapper::getInstance()->destroy();
 	return PluginImpl::OnRelease();
+}
+
+void initiTunesLib() {
+	iTunesSupportImpl::iTunesSupportImplWrapper::getInstance()->init(gcnew System::String(NERvGetModulePath()));
 }
 
 int iTunesSupport::PrepareiTunesLib() {
