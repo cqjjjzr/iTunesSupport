@@ -139,11 +139,9 @@ namespace iTunesSupportImpl
             {
                 pid = processes[0].Id;
                 createiTunesAsync().Start();
-                connectDown = false;
             } else
             {
                 connectDown = true;
-                pid = -1;
                 trackName = getTrackNameInternal();
             }
         }
@@ -153,6 +151,7 @@ namespace iTunesSupportImpl
             return new Task(() =>
             {
                 iTunes = new iTunesAppClass();
+                connectDown = false;
             });
         }
 
