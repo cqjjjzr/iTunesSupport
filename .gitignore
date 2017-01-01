@@ -246,3 +246,5 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+/Package/Recent versions
+/Package/iTunes Support ver1.2.0
