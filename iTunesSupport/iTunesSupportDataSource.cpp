@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "iTunesSupportInfoData.h"
 #include "iTunesSupportControlData.h"
+#include "iTunesLibraryInitializer.h"
 
 using namespace std;
 using namespace NERvGear;
@@ -86,6 +87,7 @@ long iTunesSupportDataSource::FindData(const NERvGear::UID& id, NERvGear::IData 
 
 iTunesSupportDataSource::iTunesSupportDataSource()
 {
+	iTunesLibraryInitializer::init();
 }
 
 iTunesSupportDataSource::~iTunesSupportDataSource()

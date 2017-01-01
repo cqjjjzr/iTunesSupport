@@ -191,6 +191,7 @@
     <ClInclude Include="iTunesSupportDataSource.h" />
     <ClInclude Include="iTunesSupport.h" />
     <ClInclude Include="iTunesSupportInfoData.h" />
+    <ClInclude Include="iTunesLibraryInitializer.h" />
     <ClInclude Include="ref.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="iTunesSupportDataSource.cpp" />
     <ClCompile Include="iTunesSupport.cpp" />
     <ClCompile Include="iTunesSupportInfoData.cpp" />
+    <ClCompile Include="iTunesLibraryInitializer.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

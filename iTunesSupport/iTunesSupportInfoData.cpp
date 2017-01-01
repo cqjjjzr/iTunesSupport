@@ -69,7 +69,6 @@ size_t getValueInternal(unsigned index, size_t nbyte, void * buf) {
 
 size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, void * buf)
 {
-	if (!iTunesSupport::initalized) return E_FAIL;
 	return getValueInternal(index, nbyte, buf);
 }
 
@@ -79,7 +78,6 @@ unsigned getTrackLengthInternal() {
 
 size_t NVG_METHOD iTunesSupportInfoData::GetMaximum(unsigned index, size_t nbyte, void * buf)
 {
-	if (!iTunesSupport::initalized) return E_FAIL;
 	switch (index) {
 	case 5: 
 		*reinterpret_cast<unsigned*>(buf) = 100;
@@ -194,7 +192,6 @@ long updateInternal(unsigned index, const wchar_t * param);
 
 long NVG_METHOD iTunesSupportInfoData::Update(unsigned index, const wchar_t * param)
 {
-	if (!iTunesSupport::initalized) return E_FAIL;
 	return updateInternal(index, param);
 }
 

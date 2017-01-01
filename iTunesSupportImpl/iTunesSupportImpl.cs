@@ -143,6 +143,7 @@ namespace iTunesSupportImpl
             } else
             {
                 connectDown = true;
+                pid = -1;
                 trackName = getTrackNameInternal();
             }
         }

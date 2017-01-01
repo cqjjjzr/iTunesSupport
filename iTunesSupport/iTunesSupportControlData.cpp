@@ -150,7 +150,6 @@ void invokeInternal(unsigned index) {
 
 long NVG_METHOD iTunesSupportControlData::Invoke(unsigned index, const wchar_t * param, NERvGear::UI::IWindow * window)
 {
-	if (!iTunesSupport::initalized) return E_FAIL;
 	invokeInternal(index);
 	return S_OK;
 }

@@ -13,6 +13,7 @@
 #include "iTunesSupport.h"
 #include "iTunesSupportDataSource.h"
 #include "iTunesSupportInfoData.h"
+#include "iTunesLibraryInitializer.h"
 #include "stdafx.h"
 #include "ref.h"
 
@@ -22,8 +23,6 @@ using namespace NERvGear;
 
 int IsiTunesLibExists();
 void initiTunesLib();
-
-BOOL iTunesSupport::initalized = FALSE;
 
 char* WcharToChar(const wchar_t* wp)
 {
@@ -40,12 +39,10 @@ long NVG_METHOD iTunesSupport::OnInitial()
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), L"iTunes Support ver%d.%d.%d"
 		, ITS_VERSION_MAJOR, ITS_VERSION_MINOR, ITS_VERSION_SUBMINOR);
 	if (!CoInitialize(NULL)) return E_FAIL;
-	if (!PrepareiTunesLib()) return E_FAIL;
+	if (iTunesLibraryInitializer::init()) return E_FAIL;
 	initiTunesLib();
 	_mkdir((string(WcharToChar(NERvGetModulePath())) + "\\artworks").c_str());
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Initialized."));
-
-	initalized = TRUE;
 
 	return PluginImpl::OnInitial();
 }
@@ -129,11 +126,4 @@ NVG_BEGIN_COMPONENT_REGISTER(iTunesSupport)
 NVG_REGISTER_OBJECT(iTunesSupportDataSource, false) // no aggregation
 NVG_END_COMPONENT_REGISTER()
 
-extern "C" bool __stdcall DllMain(void* hModule, unsigned long dwReason, void* lpReserved) \
-{ 
-if (dwReason == 1/* DLL_PROCESS_ATTACH */) 
-NVG_MODULE.hHandle = hModule; 
-iTunesSupport::PrepareiTunesLib();
-return true; 
-} 
 NVG_IMPLEMENT_PLUGIN(iTunesSupport)
