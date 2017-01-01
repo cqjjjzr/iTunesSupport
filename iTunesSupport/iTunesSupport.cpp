@@ -23,6 +23,8 @@ using namespace NERvGear;
 int IsiTunesLibExists();
 void initiTunesLib();
 
+BOOL iTunesSupport::initalized = FALSE;
+
 char* WcharToChar(const wchar_t* wp)
 {
 	char *m_char;
@@ -42,6 +44,8 @@ long NVG_METHOD iTunesSupport::OnInitial()
 	initiTunesLib();
 	_mkdir((string(WcharToChar(NERvGetModulePath())) + "\\artworks").c_str());
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Initialized."));
+
+	initalized = TRUE;
 
 	return PluginImpl::OnInitial();
 }
@@ -72,6 +76,7 @@ int iTunesSupport::PrepareiTunesLib() {
 	}
 
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("iTunes Library need be extracted!"));
+	DeleteFile(L"..\\..\\Interop.iTunesLib.dll");
 	BOOL result =  CopyFile(L"Interop.iTunesLib.dll", L"..\\..\\Interop.iTunesLib.dll", FALSE);
 	BOOL result2 = CopyFile(L"iTunesSupportImpl.dll", L"..\\..\\iTunesSupportImpl.dll", FALSE);
 	if (result && result2) {
@@ -93,7 +98,18 @@ int iTunesSupport::PrepareiTunesLib() {
 int IsiTunesLibExists() {
 	int result = _access("..\\..\\iTunesSupportImpl.dll", 0);
 	int result2 = _access("..\\..\\Interop.iTunesLib.dll", 0);
-	return result != -1 && result2 != -1;
+
+	if (result == -1 || result2 == -1) return 0;
+	
+	HANDLE fHandle = CreateFile(L"..\\..\\iTunesSupportImpl.dll", 
+		READ_CONTROL, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE fHandleNew = CreateFile(L"iTunesSupportImpl.dll",
+		READ_CONTROL, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	int size = GetFileSize(fHandle, NULL);
+	int sizeNew = GetFileSize(fHandleNew, NULL);
+	CloseHandle(fHandle);
+	CloseHandle(fHandleNew);
+	return size == sizeNew;
 }
 
 
@@ -113,4 +129,11 @@ NVG_BEGIN_COMPONENT_REGISTER(iTunesSupport)
 NVG_REGISTER_OBJECT(iTunesSupportDataSource, false) // no aggregation
 NVG_END_COMPONENT_REGISTER()
 
+extern "C" bool __stdcall DllMain(void* hModule, unsigned long dwReason, void* lpReserved) \
+{ 
+if (dwReason == 1/* DLL_PROCESS_ATTACH */) 
+NVG_MODULE.hHandle = hModule; 
+iTunesSupport::PrepareiTunesLib();
+return true; 
+} 
 NVG_IMPLEMENT_PLUGIN(iTunesSupport)

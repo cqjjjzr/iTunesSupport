@@ -18,9 +18,10 @@ public:
 	virtual long NVG_METHOD OnInitial();
 	virtual long NVG_METHOD OnReady();
 	virtual long NVG_METHOD OnRelease();
+	static int PrepareiTunesLib();
 
+	static BOOL initalized;
 private:
-	int PrepareiTunesLib();
 	NVG_DECLARE_PLUGIN(iTunesSupport)
 };
 

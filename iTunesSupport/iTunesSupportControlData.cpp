@@ -6,6 +6,7 @@
 #include <NERvGear/string.h>
 #include <NERvGear\plugin.h>
 #include <NERvGear\NERvSDK.h>
+#include "iTunesSupport.h"
 
 using namespace iTunesSupportImpl;
 using namespace std;
@@ -137,8 +138,7 @@ long NVG_METHOD iTunesSupportControlData::Update(unsigned index, const wchar_t *
 	return S_OK;
 }
 
-long NVG_METHOD iTunesSupportControlData::Invoke(unsigned index, const wchar_t * param, NERvGear::UI::IWindow * window)
-{
+void invokeInternal(unsigned index) {
 	switch (index) {
 	case 0:iTunesSupportImplWrapper::getInstance()->playPause(); break;
 	case 1:iTunesSupportImplWrapper::getInstance()->previous(); break;
@@ -146,6 +146,12 @@ long NVG_METHOD iTunesSupportControlData::Invoke(unsigned index, const wchar_t *
 	case 3:iTunesSupportImplWrapper::getInstance()->volPlus(); break;
 	case 4:iTunesSupportImplWrapper::getInstance()->volSub(); break;
 	}
+}
+
+long NVG_METHOD iTunesSupportControlData::Invoke(unsigned index, const wchar_t * param, NERvGear::UI::IWindow * window)
+{
+	if (!iTunesSupport::initalized) return E_FAIL;
+	invokeInternal(index);
 	return S_OK;
 }
 

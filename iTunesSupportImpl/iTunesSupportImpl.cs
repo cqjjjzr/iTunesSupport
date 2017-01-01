@@ -78,15 +78,12 @@ namespace iTunesSupportImpl
        
         public void update(int index, string param)
         {
+            if (connectDown) tryEstablishConnect();
+            if (connectDown) return;
             new Task(() =>
             {
                 try
                 {
-                    if (connectDown)
-                    {
-                        tryEstablishConnect();
-                    }
-
                     updateCurrentTrackAndUpdateLyric();
                     updateTimes++;
                     if (updateTimes >= 1000)

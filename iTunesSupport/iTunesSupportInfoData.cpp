@@ -48,13 +48,12 @@ unsigned NVG_METHOD iTunesSupportInfoData::GetValueCount()
 	return 9;
 }
 
-size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, void * buf)
-{
+size_t getValueInternal(unsigned index, size_t nbyte, void * buf) {
 	switch (index) {
 	case 5:
 		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->volume;
 		return sizeof(unsigned);
-	case 0: 
+	case 0:
 		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->progressSecond;
 		return sizeof(unsigned);
 	case 1: return writeCSharpStringToValue(iTunesSupportImplWrapper::getInstance()->progressFormatted, nbyte, buf);
@@ -68,14 +67,25 @@ size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, 
 	}
 }
 
+size_t NVG_METHOD iTunesSupportInfoData::GetValue(unsigned index, size_t nbyte, void * buf)
+{
+	if (!iTunesSupport::initalized) return E_FAIL;
+	return getValueInternal(index, nbyte, buf);
+}
+
+unsigned getTrackLengthInternal() {
+	return iTunesSupportImplWrapper::getInstance()->trackLength;
+}
+
 size_t NVG_METHOD iTunesSupportInfoData::GetMaximum(unsigned index, size_t nbyte, void * buf)
 {
+	if (!iTunesSupport::initalized) return E_FAIL;
 	switch (index) {
 	case 5: 
 		*reinterpret_cast<unsigned*>(buf) = 100;
 		return sizeof(unsigned);
 	case 0:
-		*reinterpret_cast<unsigned*>(buf) = iTunesSupportImplWrapper::getInstance()->trackLength;
+		*reinterpret_cast<unsigned*>(buf) = getTrackLengthInternal();
 		return sizeof(unsigned);
 	default:return 0;
 	}
@@ -180,8 +190,15 @@ unsigned NVG_METHOD iTunesSupportInfoData::GetUpdateInterval(unsigned index)
 	}
 }
 
+long updateInternal(unsigned index, const wchar_t * param);
+
 long NVG_METHOD iTunesSupportInfoData::Update(unsigned index, const wchar_t * param)
 {
+	if (!iTunesSupport::initalized) return E_FAIL;
+	return updateInternal(index, param);
+}
+
+long updateInternal(unsigned index, const wchar_t * param) {
 	//NO MEMORY LEAK!
 	if (index >= 9)
 		return E_INVALIDARG;
