@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace iTunesSupportImpl
 {
@@ -24,7 +24,7 @@ namespace iTunesSupportImpl
         public string artworkRootPath;
         public const int SUCCESS = 1;
         public const int FAIL = 0;
-        public LyricEntry ERROR_ENTRY = new LyricEntry(0, "当前没有正在播放的曲目或曲目歌词标签不是LRC格式...", "");
+        public static LyricEntry ERROR_ENTRY = new LyricEntry(0, "当前没有正在播放的曲目或曲目歌词标签不是LRC格式...", "");
         
         private IiTunes iTunes;
         private IITTrack currentTrack;
@@ -33,16 +33,26 @@ namespace iTunesSupportImpl
 
         private int updateTimes = 0;
 
-        public string trackName { get; private set; }
-        public string trackArtist { get; private set; }
-        public string trackAlbum { get; private set; }
-        public int volume { get; private set; }
-        public int progressSecond { get; private set; }
-        public int trackLength { get; private set; }
-        public string progressFormatted { get; private set; }
-        public LyricEntry lyric { get; private set; }
-        public string cover { get; private set; }
-        
+        private string _trackName = "";
+        private string _trackArtist = "";
+        private string _trackAlbum = "";
+        private int _volume = 0;
+        private int _progressSecond = 0;
+        private int _trackLength = 0;
+        private string _progressFormatted = "";
+        private LyricEntry _lyric = ERROR_ENTRY;
+        private string _cover = "";
+
+        public string trackName { get { return _trackName; } private set { _trackName = value; } }
+        public string trackArtist { get { return _trackArtist; } private set { _trackArtist = value; } }
+        public string trackAlbum { get { return _trackAlbum; } private set { _trackAlbum = value; } }
+        public int volume { get { return _volume; } private set { _volume = value; } }
+        public int progressSecond { get { return _progressSecond; } private set { _progressSecond = value; } }
+        public int trackLength { get { return _trackLength; } private set { _trackLength = value; } }
+        public string progressFormatted { get { return _progressFormatted; } private set { _progressFormatted = value; } }
+        public LyricEntry lyric { get { return _lyric; } private set { _lyric = value; } }
+        public string cover { get { return _cover; } private set { _cover = value; } }
+
         private Regex lyricWordRegex = new Regex(@".*\](.*)", RegexOptions.Compiled);
         private Regex lyricTimeRegex = new Regex(@"\[([0-9.:]*)\]+(.*)", RegexOptions.Compiled);
         private double lyricOffset;
@@ -65,56 +75,63 @@ namespace iTunesSupportImpl
         {
             return SUCCESS;
         }
-
-        public int update(int index, string param)
+       
+        public void update(int index, string param)
         {
-            try
+            new Task(() =>
             {
-                if (connectDown)
+                try
                 {
-                    tryEstablishConnect();
-                }
-
-                IITTrack prev = currentTrack;
-                currentTrack = iTunes.CurrentTrack;
-                if (prev != null && currentTrack != null && (currentTrack.Name != prev.Name || currentTrack.Size != prev.Size))
-                {
-                    updateLyrics();
-                }
-                updateTimes++;
-                if (updateTimes >= 100)
-                {
-                    GC.Collect();
-                    updateTimes = 0;
-                    updateLyrics();
-                }
-
-                switch (index)
-                {
-                    case 0: progressSecond = getPlaybackProgressInSecondInternal(); trackLength = getTrackLengthInSecondInternal(); break;
-                    case 1: progressFormatted = getPlaybackProgressFormattedInternal(); break;
-                    case 2: trackName = getTrackNameInternal(); processTrackNameRoll(param); break;
-                    case 3: trackArtist = getTrackArtistInternal(); processTrackArtistRoll(param); break;
-                    case 4: trackAlbum = getTrackAlbumInternal(); processTrackAlbumRoll(param); break;
-                    case 5: volume = getVolumeInternal(); break;
-                    case 6:
-                    case 7: lyric = getLyricInternal(); break;
-                    case 8: cover = getArtworkFileNameInternal(); break;
-                }
-                return SUCCESS;
-            } catch (Exception ex)
-            {
-                if (ex is COMException)
-                {
-                    connectDown = true;
-                    if (index == 2)
+                    if (connectDown)
                     {
-                        trackName = getTrackNameInternal();
-                        return SUCCESS;
-                    }//DISPLAY CONNECT DOWN MESSAGE
-                    return FAIL;
+                        tryEstablishConnect();
+                    }
+
+                    updateCurrentTrackAndUpdateLyric();
+                    updateTimes++;
+                    if (updateTimes >= 1000)
+                    {
+                        GC.Collect();
+                        updateTimes = 0;
+                    }
+
+                    updateFields(index, param);
                 }
-                return FAIL;
+                catch (Exception ex)
+                {
+                    if (ex is COMException)
+                    {
+                        connectDown = true;
+                        if (index == 2)
+                            trackName = getTrackNameInternal();
+                    }
+                }
+            }).Start();
+        }
+
+        private void updateFields(int index, string param)
+        {
+            switch (index)
+            {
+                case 0: progressSecond = getPlaybackProgressInSecondInternal(); trackLength = getTrackLengthInSecondInternal(); break;
+                case 1: progressFormatted = getPlaybackProgressFormattedInternal(); break;
+                case 2: trackName = getTrackNameInternal(); processTrackNameRollSetting(param); break;
+                case 3: trackArtist = getTrackArtistInternal(); processTrackArtistRollSetting(param); break;
+                case 4: trackAlbum = getTrackAlbumInternal(); processTrackAlbumRollSetting(param); break;
+                case 5: volume = getVolumeInternal(); break;
+                case 6:
+                case 7: lyric = getLyricInternal(); break;
+                case 8: cover = getArtworkFileNameInternal(); break;
+            }
+        }
+
+        private void updateCurrentTrackAndUpdateLyric()
+        {
+            IITTrack prev = currentTrack;
+            currentTrack = iTunes.CurrentTrack;
+            if (updateTimes >= 100 || (prev != null && currentTrack != null && (currentTrack.Name != prev.Name || currentTrack.Size != prev.Size)))
+            {
+                updateLyrics();
             }
         }
 
@@ -124,7 +141,7 @@ namespace iTunesSupportImpl
             if (processes.Length != 0 && processes[0].Id != pid)
             {
                 pid = processes[0].Id;
-                iTunes = new iTunesAppClass();
+                createiTunesAsync().Start();
                 connectDown = false;
             } else
             {
@@ -133,7 +150,15 @@ namespace iTunesSupportImpl
             }
         }
 
-        private void processRoll(string param, out bool roll, out int limit)
+        private Task createiTunesAsync()
+        {
+            return new Task(() =>
+            {
+                iTunes = new iTunesAppClass();
+            });
+        }
+
+        private void processRollSetting(string param, out bool roll, out int limit)
         {
             if (param.StartsWith("roll"))
             {
@@ -156,27 +181,27 @@ namespace iTunesSupportImpl
             limit = 10;
         }
 
-        private void processTrackAlbumRoll(string param)
+        private void processTrackAlbumRollSetting(string param)
         {
-            processRoll(param, out rollAlbum, out rollAlbumLimit);
+            processRollSetting(param, out rollAlbum, out rollAlbumLimit);
         }
 
-        private void processTrackArtistRoll(string param)
+        private void processTrackArtistRollSetting(string param)
         {
-            processRoll(param, out rollArtist, out rollArtistLimit);
+            processRollSetting(param, out rollArtist, out rollArtistLimit);
         }
 
-        private void processTrackNameRoll(string param)
+        private void processTrackNameRollSetting(string param)
         {
-            processRoll(param, out rollTrackName, out rollTrackNameLimit);
+            processRollSetting(param, out rollTrackName, out rollTrackNameLimit);
         }
 
-        public int updateLyrics()
+        public void updateLyrics()
         {
             if (!(currentTrack is IITFileOrCDTrack))
             {
                 currentTrackLyrics = null;
-                return SUCCESS;
+                return;
             }
 
             try
@@ -193,9 +218,8 @@ namespace iTunesSupportImpl
                 Console.WriteLine(ex.ToString());
                 Console.WriteLine(ex.StackTrace);
 #endif
-                return SUCCESS;
+                return;
             }
-            return SUCCESS;
         }
 
         private void parseLyric(string lyric)
@@ -262,7 +286,19 @@ namespace iTunesSupportImpl
             double.TryParse(line.Substring(line.IndexOf(':') + 1).TrimEnd(']'), out lyricOffset);
         }
 
-        int trackNameRoll = 0;
+        private string processRoll(string original, bool roll, int limit, ref int rollProgress)
+        {
+            if (!roll) return original;
+            if (original.Length < limit) return original;
+            string temp = original;
+            if (rollProgress > temp.Length)
+                rollProgress = 0;
+            string final = temp.Substring(rollProgress) + "   " + temp.Substring(0, rollProgress);
+            rollProgress++;
+            return final;
+        }
+
+        int trackNameRollProgress = 0;
         public bool rollTrackName = false;
         public int rollTrackNameLimit = 10;
         private string getTrackNameInternal()
@@ -275,14 +311,7 @@ namespace iTunesSupportImpl
                     return "当前没有正在播放的曲目...";
                 else
                 {
-                    if (!rollTrackName) return currentTrack.Name;
-                    if (currentTrack.Name.Length < rollTrackNameLimit) return currentTrack.Name;
-                    string temp = currentTrack.Name;
-                    if (trackNameRoll > temp.Length)
-                        trackNameRoll = 0;
-                    string final = temp.Substring(trackNameRoll) + "   " + temp.Substring(0, trackNameRoll);
-                    trackNameRoll++;
-                    return final;
+                    return processRoll(currentTrack.Name, rollTrackName, rollTrackNameLimit, ref trackNameRollProgress);
                 }
             } catch (Exception ex)
             {
@@ -296,7 +325,7 @@ namespace iTunesSupportImpl
             return "";
         }
         
-        int trackArtistRoll = 0;
+        int trackArtistRollProgress = 0;
         public bool rollArtist = false;
         public int rollArtistLimit = 10;
         private string getTrackArtistInternal()
@@ -305,18 +334,11 @@ namespace iTunesSupportImpl
                 return "";
             else
             {
-                if (!rollArtist) return currentTrack.Artist;
-                if (currentTrack.Artist.Length < rollArtistLimit) return currentTrack.Artist;
-                string temp = currentTrack.Artist;
-                if (trackArtistRoll > temp.Length)
-                    trackArtistRoll = 0;
-                string final = temp.Substring(trackArtistRoll) + "   " + temp.Substring(0, trackArtistRoll);
-                trackArtistRoll++;
-                return final;
+                return processRoll(currentTrack.Artist, rollArtist, rollArtistLimit, ref trackArtistRollProgress);
             }
         }
 
-        int trackAlbumRoll = 0;
+        int trackAlbumRollProgress = 0;
         public bool rollAlbum = false;
         public int rollAlbumLimit = 10;
         private string getTrackAlbumInternal()
@@ -325,14 +347,7 @@ namespace iTunesSupportImpl
                 return "";
             else
             {
-                if (!rollAlbum) return currentTrack.Album;
-                if (currentTrack.Album.Length < rollAlbumLimit) return currentTrack.Album;
-                string temp = currentTrack.Album;
-                if (trackAlbumRoll > temp.Length)
-                    trackAlbumRoll = 0;
-                string final = temp.Substring(trackAlbumRoll) + "   " + temp.Substring(0, trackAlbumRoll);
-                trackAlbumRoll++;
-                return final;
+                return processRoll(currentTrack.Album, rollAlbum, rollAlbumLimit, ref trackAlbumRollProgress);
             }
         }
 
@@ -434,52 +449,68 @@ namespace iTunesSupportImpl
 
         public void playPause()
         {
-            try
+            new Task(() =>
             {
-                iTunes.PlayPause();
-            } catch (Exception) { }
+                try
+                {
+                    iTunes.PlayPause();
+                }
+                catch (Exception) { }
+            }).Start();
         }
 
         public void previous()
         {
-            try
+            new Task(() =>
             {
-                iTunes.BackTrack();
-            }
-            catch (Exception) { }
+                try
+                {
+                    iTunes.BackTrack();
+                }
+                catch (Exception) { }
+            }).Start();
         }
 
         public void next()
         {
-            try
+            new Task(() =>
             {
-                iTunes.NextTrack();
-            }
-            catch (Exception) { }
+                try
+                {
+                    iTunes.NextTrack();
+                }
+                catch (Exception) { }
+            }).Start();
         }
 
         public void volPlus()
         {
-            try
+            new Task(() =>
             {
-                if (iTunes.SoundVolume > 90)
-                    iTunes.SoundVolume = 100;
-                else
-                    iTunes.SoundVolume += 10;
-            }
-            catch (Exception) { }
+                try
+                {
+                    if (iTunes.SoundVolume > 90)
+                        iTunes.SoundVolume = 100;
+                    else
+                        iTunes.SoundVolume += 10;
+                }
+                catch (Exception) { }
+            }).Start();
         }
 
         public void volSub()
         {
-            try
+            new Task(() =>
             {
-                if (iTunes.SoundVolume < 10)
-                    iTunes.SoundVolume = 0;
-                else
-                    iTunes.SoundVolume -= 10;
-            }
-            catch (Exception) { }
+                try
+                {
+                    if (iTunes.SoundVolume < 10)
+                        iTunes.SoundVolume = 0;
+                    else
+                        iTunes.SoundVolume -= 10;
+                }
+                catch (Exception) { }
+            }).Start();
         }
 
         public void activePointer()

@@ -6,8 +6,28 @@ namespace iTunesSupportImpl
     public class LyricEntry
     {
         public double Time { get; set; }
-        public string LyricLine1 { get; set; }
-        public string LyricLine2 { get; set; }
+        private string _line1 = "";
+        private string _line2 = "";
+        public string LyricLine1 {
+            get
+            {
+                return _line1;
+            }
+            set
+            {
+                _line1 = value;
+            }
+        }
+        public string LyricLine2 {
+            get
+            {
+                return _line2;
+            }
+            set
+            {
+                _line2 = value;
+            }
+        }
 
         public LyricEntry(double time, string lyricLine1, string lyricLine2)
         {

@@ -187,7 +187,7 @@ long NVG_METHOD iTunesSupportInfoData::Update(unsigned index, const wchar_t * pa
 		return E_INVALIDARG;
 	iTunesSupportImplWrapper^ wrapper = iTunesSupportImplWrapper::getInstance();
 	wrapper->activePointer();
-	if (!wrapper->update(index, gcnew System::String(param))) return E_FAIL;
+	wrapper->update(index, gcnew System::String(param));
 	return S_OK;
 }
 
