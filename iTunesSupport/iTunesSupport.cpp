@@ -21,9 +21,6 @@ using namespace iTunesSupportImpl;
 using namespace std;
 using namespace NERvGear;
 
-int IsiTunesLibExists();
-void initiTunesLib();
-
 char* WcharToChar(const wchar_t* wp)
 {
 	char *m_char;
@@ -40,7 +37,7 @@ long NVG_METHOD iTunesSupport::OnInitial()
 		, ITS_VERSION_MAJOR, ITS_VERSION_MINOR, ITS_VERSION_SUBMINOR);
 	if (!CoInitialize(NULL)) return E_FAIL;
 	if (iTunesLibraryInitializer::init()) return E_FAIL;
-	initiTunesLib();
+	iTunesLibraryInitializer::init();
 	_mkdir((string(WcharToChar(NERvGetModulePath())) + "\\artworks").c_str());
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Initialized."));
 
@@ -61,52 +58,6 @@ long NVG_METHOD iTunesSupport::OnRelease()
 
 void initiTunesLib() {
 	iTunesSupportImpl::iTunesSupportImplWrapper::getInstance()->init(gcnew System::String(NERvGetModulePath()));
-}
-
-int iTunesSupport::PrepareiTunesLib() {
-	wchar_t temp[200] = { 0 };
-	GetCurrentDirectory(100, temp);
-	SetCurrentDirectory(NERvGetModulePath());
-	if (IsiTunesLibExists()) {
-		SetCurrentDirectory(temp);
-		return 1;
-	}
-
-	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("iTunes Library need be extracted!"));
-	DeleteFile(L"..\\..\\Interop.iTunesLib.dll");
-	BOOL result =  CopyFile(L"Interop.iTunesLib.dll", L"..\\..\\Interop.iTunesLib.dll", FALSE);
-	BOOL result2 = CopyFile(L"iTunesSupportImpl.dll", L"..\\..\\iTunesSupportImpl.dll", FALSE);
-	if (result && result2) {
-		NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Extracted successfully."));
-		SetCurrentDirectory(temp);
-		return result;
-	}
-	else {
-		wchar_t inf[100] = { 0 };
-		wchar_t cd[100] = { 0 };
-		GetCurrentDirectory(100, cd);
-		wsprintf(inf, L"Error while extracting! error=%d currentdict=%s", GetLastError(), cd);
-		NERvLogError(NVG_TEXT("iTunesSupport"), inf);
-		SetCurrentDirectory(temp);
-		return 0;
-	}
-}
-
-int IsiTunesLibExists() {
-	int result = _access("..\\..\\iTunesSupportImpl.dll", 0);
-	int result2 = _access("..\\..\\Interop.iTunesLib.dll", 0);
-
-	if (result == -1 || result2 == -1) return 0;
-	
-	HANDLE fHandle = CreateFile(L"..\\..\\iTunesSupportImpl.dll", 
-		READ_CONTROL, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	HANDLE fHandleNew = CreateFile(L"iTunesSupportImpl.dll",
-		READ_CONTROL, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	int size = GetFileSize(fHandle, NULL);
-	int sizeNew = GetFileSize(fHandleNew, NULL);
-	CloseHandle(fHandle);
-	CloseHandle(fHandleNew);
-	return size == sizeNew;
 }
 
 

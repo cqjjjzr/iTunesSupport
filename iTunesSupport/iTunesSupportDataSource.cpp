@@ -60,6 +60,10 @@ long NVG_METHOD iTunesSupportDataSource::GetData(unsigned index, NERvGear::IData
 	if (index > 1 || data == NULL)
 		return E_INVALIDARG;
 
+	if (!iTunesLibraryInitializer::isInitialized()) {
+		return E_FAIL;
+	}
+
 	switch (index) {
 	case 0: *data = nvg_new iTunesSupportInfoData(this); break;
 	case 1: *data = nvg_new iTunesSupportControlData(this); break;
@@ -72,6 +76,10 @@ long iTunesSupportDataSource::FindData(const NERvGear::UID& id, NERvGear::IData 
 {
 	if (data == NULL)
 		return E_INVALIDARG; 
+
+	if (!iTunesLibraryInitializer::isInitialized()) {
+		return E_FAIL;
+	}
 
 	if (id == infoDataUID)
 	{
