@@ -24,7 +24,7 @@ int PrepareiTunesLib() {
 	SetCurrentDirectory(NERvGetModulePath());
 	if (IsiTunesLibExists()) {
 		SetCurrentDirectory(temp);
-		return 1;
+		return S_OK;
 	}
 
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("iTunes Library need be extracted!"));
@@ -68,6 +68,7 @@ long iTunesLibraryInitializer::init()
 {
 	if (!initialized) {
 		if (!checkiTunesCOMExists()) {
+			NERvLogError(NVG_TEXT("iTunesSupport"), NVG_TEXT("iTunes not found. Plugin stopping!"));
 			return E_FAIL;
 		}
 		long result = PrepareiTunesLib();

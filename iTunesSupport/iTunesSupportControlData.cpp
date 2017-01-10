@@ -7,6 +7,7 @@
 #include <NERvGear\plugin.h>
 #include <NERvGear\NERvSDK.h>
 #include "iTunesSupport.h"
+#include "iTunesLibraryInitializer.h"
 
 using namespace iTunesSupportImpl;
 using namespace std;
@@ -150,8 +151,11 @@ void invokeInternal(unsigned index) {
 
 long NVG_METHOD iTunesSupportControlData::Invoke(unsigned index, const wchar_t * param, NERvGear::UI::IWindow * window)
 {
-	invokeInternal(index);
-	return S_OK;
+	if (iTunesLibraryInitializer::isInitialized()) {
+		invokeInternal(index);
+		return S_OK;
+	}
+	return E_FAIL;
 }
 
 size_t NVG_METHOD iTunesSupportControlData::Config(unsigned index, NERvGear::DATA::CONFIG type, NERvGear::UI::IWindow * window, size_t len, wchar_t * param)

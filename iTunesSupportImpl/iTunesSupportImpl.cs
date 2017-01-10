@@ -14,6 +14,7 @@ namespace iTunesSupportImpl
     {
         private iTunesSupportImplWrapper() {}
         private static iTunesSupportImplWrapper instance;
+        private object operationLockObject = new object();
 
         public static iTunesSupportImplWrapper getInstance()
         {
@@ -28,7 +29,7 @@ namespace iTunesSupportImpl
         
         private IiTunes iTunes;
         private IITTrack currentTrack;
-        private bool connectDown;
+        private volatile bool connectDown = true;
         private int pid;
 
         private int updateTimes = 0;
@@ -62,7 +63,7 @@ namespace iTunesSupportImpl
         {
             try
             {
-                tryEstablishConnect();
+                if (connectDown) tryEstablishConnect();
                 artworkRootPath = rootpath + "\\artworks\\";
             } catch (Exception)
             {
@@ -78,29 +79,32 @@ namespace iTunesSupportImpl
        
         public void update(int index, string param)
         {
-            if (connectDown) tryEstablishConnect();
-            if (connectDown) return;
             new Task(() =>
             {
-                try
+                lock (this)
                 {
-                    updateCurrentTrackAndUpdateLyric();
-                    updateTimes++;
-                    if (updateTimes >= 1000)
+                    if (connectDown) tryEstablishConnect();
+                    if (connectDown) return;
+                    try
                     {
-                        GC.Collect();
-                        updateTimes = 0;
-                    }
+                        updateCurrentTrackAndUpdateLyric();
+                        updateTimes++;
+                        if (updateTimes >= 1000)
+                        {
+                            GC.Collect();
+                            updateTimes = 0;
+                        }
 
-                    updateFields(index, param);
-                }
-                catch (Exception ex)
-                {
-                    if (ex is COMException)
+                        updateFields(index, param);
+                    }
+                    catch (Exception ex)
                     {
-                        connectDown = true;
-                        if (index == 2)
-                            trackName = getTrackNameInternal();
+                        if (ex is COMException)
+                        {
+                            connectDown = true;
+                            if (index == 2)
+                                trackName = getTrackNameInternal();
+                        }
                     }
                 }
             }).Start();
@@ -138,21 +142,13 @@ namespace iTunesSupportImpl
             if (processes.Length != 0 && processes[0].Id != pid)
             {
                 pid = processes[0].Id;
-                createiTunesAsync().Start();
+                iTunes = new iTunesAppClass();
+                connectDown = false;
             } else
             {
                 connectDown = true;
                 trackName = getTrackNameInternal();
             }
-        }
-
-        private Task createiTunesAsync()
-        {
-            return new Task(() =>
-            {
-                iTunes = new iTunesAppClass();
-                connectDown = false;
-            });
         }
 
         private void processRollSetting(string param, out bool roll, out int limit)
@@ -424,8 +420,10 @@ namespace iTunesSupportImpl
                     artworks[1].SaveArtworkToFile(filepath);
                 return filepath;
             }
-            catch (Exception)
-            { }
+            catch (Exception ex)
+            {
+                Console.Write("!");
+            }
             return "";
         }
 
@@ -448,11 +446,12 @@ namespace iTunesSupportImpl
         {
             new Task(() =>
             {
-                try
-                {
-                    iTunes.PlayPause();
-                }
-                catch (Exception) { }
+                lock (operationLockObject)
+                    try
+                    {
+                        iTunes.PlayPause();
+                    }
+                    catch (Exception) { }
             }).Start();
         }
 
@@ -460,11 +459,12 @@ namespace iTunesSupportImpl
         {
             new Task(() =>
             {
-                try
-                {
-                    iTunes.BackTrack();
-                }
-                catch (Exception) { }
+                lock (operationLockObject)
+                    try
+                    {
+                        iTunes.BackTrack();
+                    }
+                    catch (Exception) { }
             }).Start();
         }
 
@@ -472,11 +472,12 @@ namespace iTunesSupportImpl
         {
             new Task(() =>
             {
-                try
-                {
-                    iTunes.NextTrack();
-                }
-                catch (Exception) { }
+                lock (operationLockObject)
+                    try
+                    {
+                        iTunes.NextTrack();
+                    }
+                    catch (Exception) { }
             }).Start();
         }
 
@@ -484,14 +485,15 @@ namespace iTunesSupportImpl
         {
             new Task(() =>
             {
-                try
-                {
-                    if (iTunes.SoundVolume > 90)
-                        iTunes.SoundVolume = 100;
-                    else
-                        iTunes.SoundVolume += 10;
-                }
-                catch (Exception) { }
+                lock (operationLockObject)
+                    try
+                    {
+                        if (iTunes.SoundVolume > 90)
+                            iTunes.SoundVolume = 100;
+                        else
+                            iTunes.SoundVolume += 10;
+                    }
+                    catch (Exception) { }
             }).Start();
         }
 
@@ -499,14 +501,15 @@ namespace iTunesSupportImpl
         {
             new Task(() =>
             {
-                try
-                {
-                    if (iTunes.SoundVolume < 10)
-                        iTunes.SoundVolume = 0;
-                    else
-                        iTunes.SoundVolume -= 10;
-                }
-                catch (Exception) { }
+                lock (operationLockObject)
+                    try
+                    {
+                        if (iTunes.SoundVolume < 10)
+                            iTunes.SoundVolume = 0;
+                        else
+                            iTunes.SoundVolume -= 10;
+                    }
+                    catch (Exception) { }
             }).Start();
         }
 

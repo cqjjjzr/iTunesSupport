@@ -31,13 +31,18 @@ char* WcharToChar(const wchar_t* wp)
 	return m_char;
 }
 
+void initiTunesLib() {
+	iTunesSupportImpl::iTunesSupportImplWrapper::getInstance()->init(gcnew System::String(NERvGetModulePath()));
+}
+
 long NVG_METHOD iTunesSupport::OnInitial()
 {
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), L"iTunes Support ver%d.%d.%d"
 		, ITS_VERSION_MAJOR, ITS_VERSION_MINOR, ITS_VERSION_SUBMINOR);
 	if (!CoInitialize(NULL)) return E_FAIL;
 	if (iTunesLibraryInitializer::init()) return E_FAIL;
-	iTunesLibraryInitializer::init();
+	//iTunesLibraryInitializer::init();
+	initiTunesLib();
 	_mkdir((string(WcharToChar(NERvGetModulePath())) + "\\artworks").c_str());
 	NERvLogInfo(NVG_TEXT("iTunesSupport"), NVG_TEXT("Initialized."));
 
@@ -55,11 +60,6 @@ long NVG_METHOD iTunesSupport::OnRelease()
 	iTunesSupportImplWrapper::getInstance()->destroy();
 	return PluginImpl::OnRelease();
 }
-
-void initiTunesLib() {
-	iTunesSupportImpl::iTunesSupportImplWrapper::getInstance()->init(gcnew System::String(NERvGetModulePath()));
-}
-
 
 NVG_BEGIN_PLUGIN_INFO(iTunesSupport)
 NVG_DECLARE_PLUGIN_UID(0x8d9dcc7d, 0x3e42, 0x4c66, 0x97, 0x21, 0x89, 0x75, 0x50, 0xda, 0x05, 0x8c)
