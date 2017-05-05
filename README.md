@@ -13,7 +13,7 @@ iTunes Support是一个以NERvSDK为基础开发的插件。目标是将iTunes�
 
 从GitHub存储库的Release获取最新版本的发布NVG包，在SAO Utils中打开首选项->插件，点击“安装”。选择下载的NVG包，勾选“启用”，并保存配置。即可安装成功。
 
-##设置
+## 设置
 iTunes Support会提供一系列的数据源，用于操作iTunes或获取iTunes信息。
 
 ### iTunes数据获取
@@ -44,7 +44,7 @@ iTunes Support会提供一系列的数据源，用于操作iTunes或获取iTunes
 #### 专辑封面
 专辑封面桌面网页插件的作用在于将其位置设置为插件目录下的“widget\cover demo\index.html”，在插件启动的情况下就可以获取iTunes的专辑封面。如图：![](http://p1.bqimg.com/4851/b519d0084559c79d.png)
 
->注意，该字段会在第一次处理一首曲目的时候将其封面保存到插件目录下的artwork目录下。所以在专辑封面很多且磁盘空间较少的时候避免使用此字段。
+> 注意，该字段会在第一次处理一首曲目的时候将其封面保存到插件目录下的artwork目录下。所以在专辑封面很多且磁盘空间较少的时候避免使用此字段。
 
 ### iTunes控制
 该数据源用于控制iTunes。这些数据源目前只能配合GGO Widgets插件使用。
